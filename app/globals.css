@@ -2,19 +2,47 @@
 
 @import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/*
+ * Tailwind v4 ships its own margin/padding/box-sizing reset already, and it's
+ * correctly wrapped in `@layer base` so utility classes (mx-auto, p-8, ...)
+ * can override it. Anything below that should behave the same way — lose to
+ * utilities — must also live in `@layer base`. Unlayered CSS always beats
+ * layered CSS (incl. `@layer utilities`) regardless of source order, so a
+ * bare `* { margin: 0 }` here would silently break every spacing utility
+ * in the app.
+ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  button,
+  [role="button"] {
+    user-select: none;
+    -webkit-user-select: none;
+  }
 }
 
 /* Custom scrollbar */
@@ -52,11 +80,6 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-}
-
-/* Smooth transitions */
-* {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Glassmorphism effect */
@@ -121,57 +144,10 @@ select:focus {
   background-size: 1000px 100%;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 640px) {
-  html {
-    font-size: 14px;
-  }
-
-  h1 {
-    font-size: 28px;
-  }
-
-  h2 {
-    font-size: 24px;
-  }
-
-  h3 {
-    font-size: 20px;
-  }
-}
-
 /* Focus ring styles for accessibility */
 *:focus-visible {
   outline: 2px solid #f43f5e;
   outline-offset: 2px;
-}
-
-/* Button styles */
-button {
-  cursor: pointer;
-  border: none;
-  font-family: inherit;
-}
-
-/* Link styles */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* Form elements */
-input,
-textarea,
-select {
-  font-family: inherit;
-  font-size: inherit;
-}
-
-/* Disable text selection on interactive elements */
-button,
-[role="button"] {
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 /* iOS specific */

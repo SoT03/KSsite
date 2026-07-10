@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
+import CoupleScene from '@/components/CoupleScene';
 
 const calculateDaysTogether = (anniversaryDate: Date): number => {
   const now = new Date();
@@ -13,6 +14,28 @@ const calculateDaysTogether = (anniversaryDate: Date): number => {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 };
+
+function AmbientOrbs() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <motion.div
+        animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -top-20 -left-20 w-72 h-72 sm:w-96 sm:h-96 bg-rose-300/30 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
+        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        className="absolute top-1/3 -right-24 w-80 h-80 sm:w-md sm:h-112 bg-pink-300/30 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{ x: [0, 20, 0], y: [0, -25, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        className="absolute bottom-0 left-1/4 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl"
+      />
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [daysTogether, setDaysTogether] = useState<number>(0);
@@ -61,23 +84,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-pink-50 via-white to-red-50">
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-pink-50 via-white to-red-50">
+      <AmbientOrbs />
       <Navigation />
 
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-20">
+      <div className="relative max-w-4xl xl:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-24">
+        {/* Couple illustration */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <CoupleScene />
+        </motion.div>
+
         {/* Main Counter */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="mt-8"
+          className="mt-4"
         >
           <div className="relative">
             {/* Background glow */}
             <div className="absolute inset-0 bg-linear-to-r from-rose-400 to-pink-400 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
 
             {/* Card */}
-            <div className="relative backdrop-blur-xl bg-white/40 border border-white/60 rounded-3xl p-8 md:p-12 shadow-2xl">
+            <div className="relative backdrop-blur-xl bg-white/40 border border-white/60 rounded-3xl p-8 sm:p-10 md:p-16 shadow-2xl">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -92,7 +125,7 @@ export default function DashboardPage() {
                   initial={{ scale: 0.5 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.4, type: 'spring', stiffness: 100 }}
-                  className="text-7xl md:text-8xl font-bold text-transparent bg-clip-text bg-linear-to-r from-rose-500 to-pink-500 mb-4"
+                  className="text-7xl md:text-8xl lg:text-9xl font-bold text-transparent bg-clip-text bg-linear-to-r from-rose-500 to-pink-500 mb-4"
                 >
                   {daysTogether}
                 </motion.h1>
@@ -128,31 +161,31 @@ export default function DashboardPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 md:mt-16"
         >
           {/* This Year's Feature */}
           <motion.a
             href="/this-year"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="group relative backdrop-blur-xl bg-linear-to-br from-rose-200/40 to-pink-200/40 border border-white/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition cursor-pointer"
+            whileHover={{ scale: 1.04, y: -4 }}
+            whileTap={{ scale: 0.97 }}
+            className="group relative backdrop-blur-xl bg-linear-to-br from-rose-200/40 to-pink-200/40 border border-white/40 rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer"
           >
             <div className="text-4xl mb-4">💝</div>
             <h3 className="text-xl font-bold text-rose-600 mb-2">
               I love you for...
             </h3>
             <p className="text-gray-700 text-sm">
-              Open one box per day and discover reasons why I love you
+              Open one box today and discover a new reason why I love you
             </p>
-            <div className="mt-4 text-rose-500 group-hover:translate-x-2 transition transform">
+            <div className="mt-4 text-rose-500 group-hover:translate-x-2 transition-transform">
               →
             </div>
           </motion.a>
 
           {/* More Features Coming */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative backdrop-blur-xl bg-linear-to-br from-purple-200/40 to-pink-200/40 border border-white/40 rounded-2xl p-6 shadow-lg cursor-not-allowed opacity-60"
+            whileHover={{ scale: 1.02 }}
+            className="group relative backdrop-blur-xl bg-linear-to-br from-purple-200/40 to-pink-200/40 border border-white/40 rounded-2xl p-6 md:p-8 shadow-lg cursor-not-allowed opacity-60"
           >
             <div className="text-4xl mb-4">✨</div>
             <h3 className="text-xl font-bold text-gray-600 mb-2">
@@ -169,7 +202,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="text-center mt-12 text-gray-600"
+          className="text-center mt-12 md:mt-16 text-gray-600"
         >
           <p className="text-sm md:text-base">
             Built with ❤️ for someone special

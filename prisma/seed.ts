@@ -36,21 +36,7 @@ async function main() {
 		});
 	}
 
-	// Create sample messages for the current year
-	const year = new Date().getFullYear();
-	for (let day = 1; day <= 10; day++) {
-		await prisma.message.upsert({
-			where: {
-				year_dayNumber: { year, dayNumber: day },
-			},
-			update: {},
-			create: {
-				year,
-				dayNumber: day,
-				content: `your beautiful smile on day ${day}`,
-			},
-		});
-	}
+	// No sample "I love you for..." boxes are seeded — add real ones from the Admin panel.
 
 	console.log('Seed completed!');
 }

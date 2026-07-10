@@ -4,8 +4,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import FallingHearts from '@/components/FallingHearts';
+
+// Positions are randomized per mount — rendering only on the client avoids an
+// SSR/hydration mismatch (the server and client would otherwise roll different values).
+const FallingHearts = dynamic(() => import('@/components/FallingHearts'), { ssr: false });
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

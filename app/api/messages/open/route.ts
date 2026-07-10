@@ -55,16 +55,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user can open this box (day logic)
-    const now = new Date()
-    const start = new Date(now.getFullYear(), 0, 0)
-    const diff = now.getTime() - start.getTime()
-    const oneDay = 1000 * 60 * 60 * 24
-    const todayDayNumber = Math.floor(diff / oneDay)
+    // One box per day, regardless of which box it is
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
 
-    if (message.dayNumber > todayDayNumber) {
+    const openedToday = await prisma.boxOpening.findFirst({
+      where: {
+        userId: payload.userId,
+        openedAt: { gte: startOfToday },
+      },
+    })
+
+    if (openedToday) {
       return NextResponse.json(
-        { error: 'This box is not yet available' },
+        { error: "You've already opened a box today. Come back tomorrow!" },
         { status: 403 }
       )
     }
