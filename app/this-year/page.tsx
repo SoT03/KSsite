@@ -169,7 +169,7 @@ export default function ThisYearPage() {
         setOpenedBoxes(data.openedBoxes || []);
       } catch (error) {
         console.error('Error fetching messages:', error);
-        setStatusMessage('Failed to load boxes');
+        setStatusMessage('Nie udało się wczytać pudełek');
       } finally {
         setIsLoading(false);
       }
@@ -191,7 +191,7 @@ export default function ThisYearPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        setStatusMessage(data.error || 'Failed to open box');
+        setStatusMessage(data.error || 'Nie udało się otworzyć pudełka');
         setOpeningId(null);
         return;
       }
@@ -208,7 +208,7 @@ export default function ThisYearPage() {
       }, 500);
     } catch (error) {
       console.error('Error opening box:', error);
-      setStatusMessage('Failed to open box');
+      setStatusMessage('Nie udało się otworzyć pudełka');
       setOpeningId(null);
     }
   };
@@ -240,12 +240,12 @@ export default function ThisYearPage() {
           className="text-center mb-10 md:mb-14"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-rose-500 to-pink-500 mb-4">
-            I love you for...
+            Kocham Cię za...
           </h1>
           <p className="text-gray-700 text-lg">
             {hasOpenedToday
-              ? "You've opened today's box — come back tomorrow for another ✨"
-              : 'Open one box today to discover a new reason ✨'}
+              ? 'Otworzyłaś już dzisiejsze pudełko — wróć jutro po kolejne ✨'
+              : 'Otwórz dziś jedno pudełko, aby odkryć nowy powód ✨'}
           </p>
         </motion.div>
 
@@ -256,7 +256,7 @@ export default function ThisYearPage() {
             className="backdrop-blur-xl bg-white/40 border border-white/60 rounded-2xl p-10 md:p-16 text-center text-gray-600 mb-12"
           >
             <div className="text-5xl mb-4">💌</div>
-            <p className="text-lg">No boxes yet — check back soon!</p>
+            <p className="text-lg">Jeszcze nie ma pudełek — zajrzyj tu wkrótce!</p>
           </motion.div>
         ) : (
           <motion.div
@@ -304,11 +304,11 @@ export default function ThisYearPage() {
                     <div className="text-6xl mb-6">💝</div>
 
                     <h2 className="text-3xl font-bold text-rose-600 mb-6">
-                      Day {selectedMessage.dayNumber}
+                      Dzień {selectedMessage.dayNumber}
                     </h2>
 
                     <p className="text-xl text-gray-700 mb-8 leading-relaxed">
-                      I love you for...
+                      Kocham Cię za...
                       <br />
                       <span className="text-2xl font-semibold text-pink-600 block mt-4">
                         {selectedMessage.content}
@@ -321,7 +321,7 @@ export default function ThisYearPage() {
                       onClick={() => setSelectedMessage(null)}
                       className="px-8 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
                     >
-                      Close
+                      Zamknij
                     </motion.button>
                   </div>
                 </motion.div>
@@ -351,11 +351,11 @@ export default function ThisYearPage() {
           transition={{ delay: 0.4 }}
           className="backdrop-blur-xl bg-white/40 border border-white/60 rounded-2xl p-6 md:p-8"
         >
-          <h3 className="font-bold text-gray-700 mb-4">How it works:</h3>
+          <h3 className="font-bold text-gray-700 mb-4">Jak to działa:</h3>
           <ul className="space-y-2 text-gray-600 text-sm md:text-base">
-            <li>🎁 <span className="font-semibold">Available:</span> You can open one box today, any box you like</li>
-            <li>🔒 <span className="font-semibold">Locked:</span> You&apos;ve already opened a box today — come back tomorrow!</li>
-            <li>💌 <span className="font-semibold">Opened:</span> Tap it anytime to read it again</li>
+            <li>🎁 <span className="font-semibold">Dostępne:</span> Możesz dziś otworzyć jedno pudełko, dowolne które lubisz</li>
+            <li>🔒 <span className="font-semibold">Zablokowane:</span> Otworzyłaś już dziś pudełko — wróć jutro!</li>
+            <li>💌 <span className="font-semibold">Otwarte:</span> Dotknij w dowolnej chwili, aby przeczytać ponownie</li>
           </ul>
         </motion.div>
       </div>

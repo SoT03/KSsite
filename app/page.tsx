@@ -115,7 +115,7 @@ export default function DashboardPage() {
                 className="text-center"
               >
                 <p className="text-gray-600 text-lg md:text-xl mb-4">
-                  We have been together for
+                  Jesteśmy razem od
                 </p>
 
                 <motion.h1
@@ -128,7 +128,7 @@ export default function DashboardPage() {
                 </motion.h1>
 
                 <p className="text-gray-700 text-xl md:text-2xl font-semibold">
-                  {daysTogether === 1 ? 'day' : 'days'}
+                  {daysTogether === 1 ? 'dzień' : 'dni'}
                 </p>
 
                 {/* Decorative hearts */}
@@ -169,10 +169,10 @@ export default function DashboardPage() {
           >
             <div className="text-4xl mb-4">💝</div>
             <h3 className="text-xl font-bold text-rose-600 mb-2">
-              I love you for...
+              Kocham Cię za...
             </h3>
             <p className="text-gray-700 text-sm">
-              Open one box today and discover a new reason why I love you
+              Otwórz dziś jedno pudełko i odkryj nowy powód, dla którego Cię kocham
             </p>
             <div className="mt-4 text-rose-500 group-hover:translate-x-2 transition-transform">
               →
@@ -186,10 +186,10 @@ export default function DashboardPage() {
           >
             <div className="text-4xl mb-4">✨</div>
             <h3 className="text-xl font-bold text-gray-600 mb-2">
-              Coming Soon...
+              Wkrótce...
             </h3>
             <p className="text-gray-600 text-sm">
-              More magical features coming in future years
+              Więcej magicznych funkcji w kolejnych latach
             </p>
           </motion.div>
         </motion.div>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
           className="text-center mt-12 md:mt-16 text-gray-600"
         >
           <p className="text-sm md:text-base">
-            Built with ❤️ for someone special
+            Stworzone z ❤️ dla kogoś wyjątkowego
           </p>
         </motion.div>
       </div>

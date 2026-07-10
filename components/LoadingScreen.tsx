@@ -4,7 +4,7 @@
 
 import { motion } from 'framer-motion';
 
-const WORDS = ['Remember', 'you', 'are', 'my', 'world'];
+const WORDS = ['Pamiętaj,', 'że', 'jesteś', 'moim', 'światem'];
 
 export default function LoadingScreen({ icon = '❤️' }: { icon?: string }) {
   return (

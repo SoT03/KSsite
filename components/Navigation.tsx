@@ -27,8 +27,8 @@ export default function Navigation() {
   const isActive = (path: string) => pathname === path;
 
   const navItems = [
-    { href: '/', label: 'Home', icon: '❤️' },
-    { href: '/this-year', label: 'Love Letters', icon: '💝' },
+    { href: '/', label: 'Start', icon: '❤️' },
+    { href: '/this-year', label: 'Listy miłosne', icon: '💝' },
     ...(userRole === 'admin' ? [{ href: '/admin', label: 'Admin', icon: '⚙️' }] : []),
   ];
 
@@ -74,7 +74,7 @@ export default function Navigation() {
             >
               ❤️
             </motion.span>
-            Our Love
+            Nasza Miłość
           </motion.a>
 
           {/* Desktop Navigation */}
@@ -126,7 +126,7 @@ export default function Navigation() {
               onClick={handleLogout}
               className="px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
             >
-              🚪 Logout
+              🚪 Wyloguj się
             </motion.button>
           </div>
 
@@ -185,7 +185,7 @@ export default function Navigation() {
                   }}
                   className="block w-full px-4 py-3 text-left text-gray-700 bg-white/30 hover:bg-red-100 rounded-xl transition"
                 >
-                  🚪 Logout
+                  🚪 Wyloguj się
                 </motion.button>
               </div>
             </motion.div>
