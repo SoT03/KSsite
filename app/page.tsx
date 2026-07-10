@@ -13,7 +13,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 const calculateDaysTogether = (anniversaryDate: Date): number => {
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - anniversaryDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24) - 1); // Subtract 1 to count full days only
   return diffDays;
 };
 
@@ -202,7 +202,7 @@ export default function DashboardPage() {
           className="text-center mt-12 md:mt-16 text-gray-600"
         >
           <p className="text-sm md:text-base">
-            Stworzone z ❤️ dla kogoś wyjątkowego
+            Built with ❤️ for someone special
           </p>
         </motion.div>
       </div>
