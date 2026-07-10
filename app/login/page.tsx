@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
+import AmbientBackground from '@/components/AmbientBackground';
 
 // Positions are randomized per mount — rendering only on the client avoids an
 // SSR/hydration mismatch (the server and client would otherwise roll different values).
@@ -51,6 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-linear-to-br from-pink-50 to-red-50">
+      <AmbientBackground />
       <FallingHearts />
 
       <div className="absolute inset-0 flex items-center justify-center p-4">

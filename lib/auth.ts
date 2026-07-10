@@ -1,8 +1,10 @@
 // lib/auth.ts
 
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 const SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+const BCRYPT_ROUNDS = 10
 
 export interface TokenPayload {
   userId: string
@@ -20,4 +22,12 @@ export function verifyToken(token: string): TokenPayload | null {
   } catch {
     return null
   }
+}
+
+export function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, BCRYPT_ROUNDS)
+}
+
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash)
 }

@@ -5,10 +5,16 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type Scene = 'idle' | 'hug' | 'kiss';
+type Scene = 'idle' | 'hug' | 'kiss' | 'dance' | 'wave';
 
-const SEQUENCE: Scene[] = ['idle', 'hug', 'idle', 'kiss', 'idle', 'hug'];
-const SCENE_DURATIONS: Record<Scene, number> = { idle: 3200, hug: 2600, kiss: 2600 };
+const SEQUENCE: Scene[] = ['idle', 'wave', 'idle', 'hug', 'idle', 'dance', 'idle', 'kiss'];
+const SCENE_DURATIONS: Record<Scene, number> = {
+  idle: 2600,
+  hug: 2600,
+  kiss: 2600,
+  dance: 3400,
+  wave: 1800,
+};
 
 const BOY_SKIN = '#f0b990';
 const GIRL_SKIN = '#f4c6a0';
@@ -24,15 +30,17 @@ function Person({
   innerArmRotate,
   outerArmRotate,
   leanRotate,
+  bodySway,
   mirrored,
 }: {
   x: number;
   skin: string;
-  hairPath: (mirror: boolean) => React.ReactNode;
+  hairPath: () => React.ReactNode;
   shirtColor: string;
   innerArmRotate: number;
   outerArmRotate: number;
   leanRotate: number;
+  bodySway: number[] | null;
   mirrored: boolean;
 }) {
   // Local origin = feet/base point. Everything is drawn upward (negative y).
@@ -49,22 +57,28 @@ function Person({
         animate={{ y: [0, -4, 0] }}
         transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
       >
-        {/* Body + head, leans toward partner during a kiss */}
+        {/* Body + head, leans/sways depending on the scene. originX/Y pin the
+            pivot to the local (0,0) feet point — plain CSS transformOrigin
+            isn't reliably honored by framer-motion on SVG elements. */}
         <motion.g
-          animate={{ rotate: leanRotate }}
-          style={{ transformOrigin: '0px 0px' }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          animate={{ rotate: bodySway ?? leanRotate }}
+          style={{ originX: 0.5, originY: 1 }}
+          transition={
+            bodySway
+              ? { duration: 0.55, repeat: Infinity, ease: 'easeInOut' }
+              : { duration: 0.5, ease: 'easeInOut' }
+          }
         >
           {/* torso */}
           <rect x={-24} y={-95} width={48} height={95} rx={22} fill={shirtColor} />
           {/* neck */}
           <rect x={-8} y={-108} width={16} height={16} fill={skin} />
+          {/* hair (behind head, so the head circle trims it to a clean hairline) */}
+          {hairPath()}
           {/* head */}
           <circle cx={0} cy={-128} r={24} fill={skin} />
           {/* cheeks */}
           <circle cx={mirrored ? 10 : -10} cy={-122} r={4} fill="#ff9aa8" opacity={0.6} />
-          {/* hair */}
-          {hairPath(mirrored)}
           {/* eyes */}
           <circle cx={-7} cy={-129} r={2.2} fill="#2b2b2b" />
           <circle cx={7} cy={-129} r={2.2} fill="#2b2b2b" />
@@ -72,11 +86,11 @@ function Person({
           <path d="M -6 -119 Q 0 -114 6 -119" stroke="#7a4a2b" strokeWidth={2} fill="none" strokeLinecap="round" />
         </motion.g>
 
-        {/* Outer arm (away from partner) — hangs down, resting */}
+        {/* Outer arm (away from partner) — raises to wave hello */}
         <g transform={`translate(${outerShoulder.x}, ${outerShoulder.y})`}>
           <motion.g
             animate={{ rotate: outerArmRotate }}
-            style={{ transformOrigin: '0px 0px' }}
+            style={{ originX: 0.5, originY: 0 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
           >
             <rect x={-6} y={0} width={12} height={52} rx={6} fill={shirtColor} />
@@ -84,11 +98,11 @@ function Person({
           </motion.g>
         </g>
 
-        {/* Inner arm (toward partner) — swings in for the hug */}
+        {/* Inner arm (toward partner) */}
         <g transform={`translate(${innerShoulder.x}, ${innerShoulder.y})`}>
           <motion.g
             animate={{ rotate: innerArmRotate }}
-            style={{ transformOrigin: '0px 0px' }}
+            style={{ originX: 0.5, originY: 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
           >
             <rect x={-6} y={0} width={12} height={52} rx={6} fill={shirtColor} />
@@ -100,32 +114,35 @@ function Person({
   );
 }
 
-function BoyHair(mirrored: boolean) {
-  return (
-    <path
-      d="M -24 -132 Q -26 -158 0 -158 Q 26 -158 24 -132 Q 24 -142 0 -144 Q -24 -142 -24 -132 Z"
-      fill={HAIR}
-      transform={mirrored ? 'scale(-1,1)' : undefined}
-    />
-  );
+function BoyHair() {
+  // A simple rounded "cap" sitting behind the head; the head circle drawn
+  // afterward trims away everything but a clean short-hair fringe on top.
+  return <ellipse cx={0} cy={-140} rx={25} ry={19} fill={HAIR} />;
 }
 
-function GirlHair(mirrored: boolean) {
+function GirlHair() {
+  // Two soft locks flowing down past the shoulders, plus a rounded cap —
+  // all simple convex shapes so nothing renders as a jagged notch.
   return (
     <>
       <path
-        d="M -25 -130 Q -28 -160 0 -161 Q 28 -160 25 -130 Q 27 -110 20 -90 Q 22 -128 12 -136 Q 22 -150 0 -152 Q -22 -150 -12 -136 Q -22 -128 -20 -90 Q -27 -110 -25 -130 Z"
+        d="M -24 -124 C -31 -104 -30 -78 -23 -62 C -18 -66 -16 -74 -16 -84 C -19 -98 -20 -112 -18 -124 Z"
         fill={HAIR}
-        transform={mirrored ? 'scale(-1,1)' : undefined}
       />
+      <path
+        d="M 24 -124 C 31 -104 30 -78 23 -62 C 18 -66 16 -74 16 -84 C 19 -98 20 -112 18 -124 Z"
+        fill={HAIR}
+      />
+      <ellipse cx={0} cy={-134} rx={27} ry={25} fill={HAIR} />
     </>
   );
 }
 
-function FloatingHearts({ active }: { active: boolean }) {
-  const [hearts] = useState(() =>
-    Array.from({ length: 3 }, (_, i) => ({
-      left: 42 + i * 8 + Math.random() * 6,
+function FloatingEmojis({ active, emojis }: { active: boolean; emojis: string[] }) {
+  const [items] = useState(() =>
+    emojis.map((emoji, i) => ({
+      emoji,
+      left: 38 + i * 9 + Math.random() * 6,
       delay: i * 0.35,
     }))
   );
@@ -134,17 +151,17 @@ function FloatingHearts({ active }: { active: boolean }) {
     <AnimatePresence>
       {active && (
         <div className="pointer-events-none absolute inset-0">
-          {hearts.map((h, i) => (
+          {items.map((it, i) => (
             <motion.span
               key={i}
               initial={{ opacity: 0, y: 0, scale: 0.5 }}
               animate={{ opacity: [0, 1, 0], y: -60, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.8, delay: h.delay, repeat: Infinity, repeatDelay: 0.6 }}
+              exit={{ opacity: 0, transition: { duration: 0.3, repeat: 0 } }}
+              transition={{ duration: 1.8, delay: it.delay, repeat: Infinity, repeatDelay: 0.6 }}
               className="absolute text-xl"
-              style={{ left: `${h.left}%`, top: '20%' }}
+              style={{ left: `${it.left}%`, top: '20%' }}
             >
-              💕
+              {it.emoji}
             </motion.span>
           ))}
         </div>
@@ -164,17 +181,37 @@ export default function CoupleScene() {
     return () => clearTimeout(timer);
   }, [scene]);
 
-  const close = scene === 'hug' || scene === 'kiss';
+  const close = scene === 'hug' || scene === 'kiss' || scene === 'dance';
   const boyX = close ? 138 : 108;
   const girlX = close ? 202 : 232;
+
   // Boy's inner arm sits on his right (swings toward +x/right, negative rotate);
   // girl's inner arm sits on her left (swings toward -x/left, positive rotate).
-  const boyArmIn = close ? -78 : 0;
-  const girlArmIn = close ? 78 : 0;
+  let boyArmIn = 0;
+  let girlArmIn = 0;
+  let boyArmOut = 0;
+  let girlArmOut = 0;
+
+  if (scene === 'hug' || scene === 'kiss') {
+    boyArmIn = -78;
+    girlArmIn = 78;
+  } else if (scene === 'dance') {
+    // Both arms raised for a little twirl.
+    boyArmIn = -155;
+    girlArmIn = 155;
+    boyArmOut = 155;
+    girlArmOut = -155;
+  } else if (scene === 'wave') {
+    // Boy raises a hand in greeting.
+    boyArmOut = 140;
+  }
+
+  const dancing = scene === 'dance';
 
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm mx-auto h-56 sm:h-64">
-      <FloatingHearts active={close} />
+      <FloatingEmojis active={scene === 'hug' || scene === 'kiss'} emojis={['💕', '💕', '💕']} />
+      <FloatingEmojis active={dancing} emojis={['🎵', '🎶', '🎵']} />
       <svg viewBox="0 0 340 220" className="w-full h-full overflow-visible">
         <Person
           x={boyX}
@@ -182,8 +219,9 @@ export default function CoupleScene() {
           hairPath={BoyHair}
           shirtColor={BOY_SHIRT}
           innerArmRotate={boyArmIn}
-          outerArmRotate={0}
-          leanRotate={scene === 'kiss' ? 15 : 0}
+          outerArmRotate={boyArmOut}
+          leanRotate={scene === 'kiss' ? 6 : 0}
+          bodySway={dancing ? [8, -8, 8] : null}
           mirrored={false}
         />
         <Person
@@ -192,8 +230,9 @@ export default function CoupleScene() {
           hairPath={GirlHair}
           shirtColor={GIRL_DRESS}
           innerArmRotate={girlArmIn}
-          outerArmRotate={0}
-          leanRotate={scene === 'kiss' ? -15 : 0}
+          outerArmRotate={girlArmOut}
+          leanRotate={scene === 'kiss' ? -6 : 0}
+          bodySway={dancing ? [-8, 8, -8] : null}
           mirrored={true}
         />
       </svg>

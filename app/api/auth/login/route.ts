@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createToken } from '@/lib/auth'
+import { createToken, verifyPassword } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,8 +27,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // For demo purposes, compare plaintext. In production, use bcrypt properly.
-    const isPasswordValid = password === user.password
+    const isPasswordValid = await verifyPassword(password, user.password)
 
     if (!isPasswordValid) {
       return NextResponse.json(

@@ -5,16 +5,18 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FUR = '#e8935c';
-const FUR_DARK = '#c9723f';
-const BELLY = '#fbe3cf';
+// Ragdoll coloring: cream body, seal-point ears/mask/tail/paws, blue eyes.
+const BODY = '#f4ead9';
+const POINT = '#8a6e59';
+const BELLY = '#fffaf0';
+const EYE = '#6fa8dc';
 
 function CatSVG({ sitting }: { sitting: boolean }) {
   return (
     <motion.svg
       viewBox="0 0 60 44"
-      width={34}
-      height={26}
+      width={38}
+      height={29}
       animate={sitting ? { scaleY: 0.85, y: 3 } : { scaleY: [1, 0.96, 1], y: [0, 1, 0] }}
       transition={
         sitting
@@ -23,7 +25,7 @@ function CatSVG({ sitting }: { sitting: boolean }) {
       }
       style={{ transformOrigin: '30px 40px' }}
     >
-      {/* tail — a static curve, rotated around its base for the wag/curl */}
+      {/* tail — point-colored, fluffy — a static curve rotated around its base */}
       <motion.g
         animate={sitting ? { rotate: -24 } : { rotate: [0, -14, 0] }}
         transition={
@@ -31,43 +33,50 @@ function CatSVG({ sitting }: { sitting: boolean }) {
             ? { duration: 0.3 }
             : { duration: 1.1, repeat: Infinity, ease: 'easeInOut' }
         }
-        style={{ transformOrigin: '16px 30px' }}
+        style={{ originX: 1, originY: 0.83 }}
       >
         <path
           d="M 16 30 Q 2 32 4 20"
-          stroke={FUR_DARK}
-          strokeWidth={5}
+          stroke={POINT}
+          strokeWidth={6}
           strokeLinecap="round"
           fill="none"
         />
       </motion.g>
       {/* body */}
-      <ellipse cx={30} cy={30} rx={17} ry={11} fill={FUR} />
+      <ellipse cx={30} cy={30} rx={17} ry={11} fill={BODY} />
       <ellipse cx={32} cy={34} rx={10} ry={5} fill={BELLY} />
+      {/* paws (point color) */}
+      <ellipse cx={22} cy={40} rx={4} ry={2.6} fill={POINT} />
+      <ellipse cx={38} cy={40} rx={4} ry={2.6} fill={POINT} />
       {/* head */}
-      <circle cx={46} cy={17} r={10} fill={FUR} />
+      <circle cx={46} cy={17} r={10} fill={BODY} />
+      {/* seal mask over the muzzle */}
+      <ellipse cx={47} cy={19} rx={6} ry={4.5} fill={POINT} opacity={0.55} />
       <ellipse cx={47} cy={20} rx={5} ry={3.5} fill={BELLY} />
-      {/* ears */}
+      {/* ears — point color */}
       <motion.path
         d="M 39 10 L 37 2 L 44 8 Z"
-        fill={FUR}
+        fill={POINT}
         animate={{ rotate: sitting ? -6 : 0 }}
-        style={{ transformOrigin: '40px 9px' }}
+        style={{ originX: 0.43, originY: 0.88 }}
       />
       <motion.path
         d="M 51 9 L 55 1 L 54 9 Z"
-        fill={FUR}
+        fill={POINT}
         animate={{ rotate: sitting ? 6 : 0 }}
-        style={{ transformOrigin: '52px 8px' }}
+        style={{ originX: 0.25, originY: 0.88 }}
       />
-      {/* eyes */}
-      <circle cx={43} cy={16} r={1.4} fill="#2b2b2b" />
-      <circle cx={49} cy={16} r={1.4} fill="#2b2b2b" />
+      {/* eyes — Ragdoll blue */}
+      <circle cx={43} cy={16} r={1.6} fill={EYE} />
+      <circle cx={49} cy={16} r={1.6} fill={EYE} />
+      <circle cx={43.3} cy={15.7} r={0.5} fill="#fff" />
+      <circle cx={49.3} cy={15.7} r={0.5} fill="#fff" />
       {/* nose */}
       <path d="M 45.3 19.5 L 46.7 19.5 L 46 20.6 Z" fill="#8a4a3a" />
       {/* whiskers */}
-      <path d="M 40 19 L 34 18 M 40 20.5 L 34 21.5" stroke="#c9723f" strokeWidth={0.7} />
-      <path d="M 52 19 L 58 18 M 52 20.5 L 58 21.5" stroke="#c9723f" strokeWidth={0.7} />
+      <path d="M 40 19 L 34 18 M 40 20.5 L 34 21.5" stroke={POINT} strokeWidth={0.7} />
+      <path d="M 52 19 L 58 18 M 52 20.5 L 58 21.5" stroke={POINT} strokeWidth={0.7} />
     </motion.svg>
   );
 }

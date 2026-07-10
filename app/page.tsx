@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import CoupleScene from '@/components/CoupleScene';
+import AmbientBackground from '@/components/AmbientBackground';
 
 const calculateDaysTogether = (anniversaryDate: Date): number => {
   const now = new Date();
@@ -85,6 +86,7 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-pink-50 via-white to-red-50">
+      <AmbientBackground />
       <AmbientOrbs />
       <Navigation />
 
