@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import CoupleScene from '@/components/CoupleScene';
 import AmbientBackground from '@/components/AmbientBackground';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const calculateDaysTogether = (anniversaryDate: Date): number => {
   const now = new Date();
@@ -75,13 +76,7 @@ export default function DashboardPage() {
   }, [router]);
 
   if (!isAuthenticated || isLoading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-pink-50 to-red-50">
-        <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
-          <div className="text-4xl">❤️</div>
-        </motion.div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

@@ -32,6 +32,7 @@ function Person({
   leanRotate,
   bodySway,
   mirrored,
+  kissing,
 }: {
   x: number;
   skin: string;
@@ -42,6 +43,7 @@ function Person({
   leanRotate: number;
   bodySway: number[] | null;
   mirrored: boolean;
+  kissing?: boolean;
 }) {
   // Local origin = feet/base point. Everything is drawn upward (negative y).
   // "Inner" = the arm on the side facing the partner; "outer" = the far side.
@@ -69,21 +71,36 @@ function Person({
               : { duration: 0.5, ease: 'easeInOut' }
           }
         >
+          {/* hair — drawn first so it sits behind both the neck and the
+              collar; the strands run down past the collar line so the
+              torso trims them to a clean edge, reading as loose hair
+              falling behind the neck rather than hair worn in front. */}
+          {hairPath()}
           {/* torso */}
           <rect x={-24} y={-95} width={48} height={95} rx={22} fill={shirtColor} />
           {/* neck */}
           <rect x={-8} y={-108} width={16} height={16} fill={skin} />
-          {/* hair (behind head, so the head circle trims it to a clean hairline) */}
-          {hairPath()}
           {/* head */}
           <circle cx={0} cy={-128} r={24} fill={skin} />
           {/* cheeks */}
-          <circle cx={mirrored ? 10 : -10} cy={-122} r={4} fill="#ff9aa8" opacity={0.6} />
-          {/* eyes */}
-          <circle cx={-7} cy={-129} r={2.2} fill="#2b2b2b" />
-          <circle cx={7} cy={-129} r={2.2} fill="#2b2b2b" />
-          {/* smile */}
-          <path d="M -6 -119 Q 0 -114 6 -119" stroke="#7a4a2b" strokeWidth={2} fill="none" strokeLinecap="round" />
+          <circle cx={mirrored ? 10 : -10} cy={-122} r={4} fill="#ff9aa8" opacity={kissing ? 0.85 : 0.6} />
+          {kissing ? (
+            <>
+              {/* eyes closed */}
+              <path d="M -10 -129 Q -7 -126.5 -4 -129" stroke="#2b2b2b" strokeWidth={1.8} fill="none" strokeLinecap="round" />
+              <path d="M 4 -129 Q 7 -126.5 10 -129" stroke="#2b2b2b" strokeWidth={1.8} fill="none" strokeLinecap="round" />
+              {/* lips puckered toward the partner */}
+              <ellipse cx={mirrored ? -6 : 6} cy={-118} rx={3.4} ry={2.6} fill="#d1667f" />
+            </>
+          ) : (
+            <>
+              {/* eyes */}
+              <circle cx={-7} cy={-129} r={2.2} fill="#2b2b2b" />
+              <circle cx={7} cy={-129} r={2.2} fill="#2b2b2b" />
+              {/* smile */}
+              <path d="M -6 -119 Q 0 -114 6 -119" stroke="#7a4a2b" strokeWidth={2} fill="none" strokeLinecap="round" />
+            </>
+          )}
         </motion.g>
 
         {/* Outer arm (away from partner) — raises to wave hello */}
@@ -121,20 +138,15 @@ function BoyHair() {
 }
 
 function GirlHair() {
-  // Two soft locks flowing down past the shoulders, plus a rounded cap —
-  // all simple convex shapes so nothing renders as a jagged notch.
+  // Straight, loose hair: one flat silhouette (not separate locks/caps
+  // layered on top of each other, which read as a bulging blob) — a
+  // rounded crown with straight vertical sides falling to a blunt,
+  // lightly-rounded hem at the middle of the neck (y = -100).
   return (
-    <>
-      <path
-        d="M -24 -124 C -31 -104 -30 -78 -23 -62 C -18 -66 -16 -74 -16 -84 C -19 -98 -20 -112 -18 -124 Z"
-        fill={HAIR}
-      />
-      <path
-        d="M 24 -124 C 31 -104 30 -78 23 -62 C 18 -66 16 -74 16 -84 C 19 -98 20 -112 18 -124 Z"
-        fill={HAIR}
-      />
-      <ellipse cx={0} cy={-134} rx={27} ry={25} fill={HAIR} />
-    </>
+    <path
+      d="M -27 -128 C -27 -148 -15 -158 0 -158 C 15 -158 27 -148 27 -128 L 27 -103 Q 27 -100 24 -100 L -24 -100 Q -27 -100 -27 -103 Z"
+      fill={HAIR}
+    />
   );
 }
 
@@ -220,9 +232,10 @@ export default function CoupleScene() {
           shirtColor={BOY_SHIRT}
           innerArmRotate={boyArmIn}
           outerArmRotate={boyArmOut}
-          leanRotate={scene === 'kiss' ? 6 : 0}
+          leanRotate={scene === 'kiss' ? 9 : 0}
           bodySway={dancing ? [8, -8, 8] : null}
           mirrored={false}
+          kissing={scene === 'kiss'}
         />
         <Person
           x={girlX}
@@ -231,10 +244,28 @@ export default function CoupleScene() {
           shirtColor={GIRL_DRESS}
           innerArmRotate={girlArmIn}
           outerArmRotate={girlArmOut}
-          leanRotate={scene === 'kiss' ? -6 : 0}
+          leanRotate={scene === 'kiss' ? -9 : 0}
           bodySway={dancing ? [-8, 8, -8] : null}
           mirrored={true}
+          kissing={scene === 'kiss'}
         />
+        <AnimatePresence>
+          {scene === 'kiss' && (
+            <motion.text
+              key="kiss-spark"
+              x={(boyX + girlX) / 2}
+              y={88}
+              textAnchor="middle"
+              fontSize={20}
+              initial={{ opacity: 0, scale: 0.4 }}
+              animate={{ opacity: [0, 1, 1, 0], scale: [0.4, 1.2, 1, 0.8] }}
+              exit={{ opacity: 0, transition: { duration: 0.3, repeat: 0 } }}
+              transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 0.7 }}
+            >
+              💋
+            </motion.text>
+          )}
+        </AnimatePresence>
       </svg>
     </div>
   );

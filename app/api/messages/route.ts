@@ -73,20 +73,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if message already exists for this day
-    const existing = await prisma.message.findUnique({
-      where: {
-        year_dayNumber: { year, dayNumber: parseInt(dayNumber) },
-      },
-    })
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'A message already exists for this day' },
-        { status: 400 }
-      )
-    }
-
     const message = await prisma.message.create({
       data: {
         dayNumber: parseInt(dayNumber),
@@ -97,6 +83,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(message, { status: 201 })
   } catch (error) {
+    // Unique constraint on [year, dayNumber] — relying on this instead of a
+    // separate findUnique pre-check saves a DB round trip on every add.
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: string }).code === 'P2002'
+    ) {
+      return NextResponse.json(
+        { error: 'A message already exists for this day' },
+        { status: 400 }
+      )
+    }
     console.error('POST /api/messages error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

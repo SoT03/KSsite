@@ -5,9 +5,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Ragdoll coloring: cream body, seal-point ears/mask/tail/paws, blue eyes.
+// Ragdoll coloring: cream body, black/grey (seal-lynx-ish) points on ears/mask/tail/paws, blue eyes.
 const BODY = '#f4ead9';
-const POINT = '#8a6e59';
+const POINT = '#3f3f42';
 const BELLY = '#fffaf0';
 const EYE = '#6fa8dc';
 
@@ -73,7 +73,7 @@ function CatSVG({ sitting }: { sitting: boolean }) {
       <circle cx={43.3} cy={15.7} r={0.5} fill="#fff" />
       <circle cx={49.3} cy={15.7} r={0.5} fill="#fff" />
       {/* nose */}
-      <path d="M 45.3 19.5 L 46.7 19.5 L 46 20.6 Z" fill="#8a4a3a" />
+      <path d="M 45.3 19.5 L 46.7 19.5 L 46 20.6 Z" fill="#6b5a5d" />
       {/* whiskers */}
       <path d="M 40 19 L 34 18 M 40 20.5 L 34 21.5" stroke={POINT} strokeWidth={0.7} />
       <path d="M 52 19 L 58 18 M 52 20.5 L 58 21.5" stroke={POINT} strokeWidth={0.7} />

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import AmbientBackground from '@/components/AmbientBackground';
+import LoadingScreen from '@/components/LoadingScreen';
 
 interface Message {
   id: string;
@@ -32,6 +33,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ dayNumber: 1, content: '' });
   const [statusMessage, setStatusMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -82,6 +84,7 @@ export default function AdminPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatusMessage('');
+    setIsSubmitting(true);
 
     try {
       const method = editingId ? 'PUT' : 'POST';
@@ -99,13 +102,19 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        setStatusMessage(
-          editingId ? 'Message updated!' : 'Message added!'
+        const saved = await response.json();
+        // Update the local list from the response directly instead of
+        // re-fetching the whole table — saves a round trip and avoids the
+        // add/edit feeling slow.
+        setMessages((prev) =>
+          editingId
+            ? prev.map((m) => (m.id === saved.id ? saved : m))
+            : [...prev, saved]
         );
+        setStatusMessage(editingId ? 'Message updated!' : 'Message added!');
         setShowModal(false);
         setEditingId(null);
         setFormData({ dayNumber: 1, content: '' });
-        fetchMessages();
 
         setTimeout(() => setStatusMessage(''), 3000);
       } else {
@@ -115,7 +124,17 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error submitting form:', error);
       setStatusMessage('Error saving message');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleAddMessage = () => {
+    const nextDay = messages.length
+      ? Math.max(...messages.map((m) => m.dayNumber)) + 1
+      : 1;
+    setFormData({ dayNumber: nextDay, content: '' });
+    setShowModal(true);
   };
 
   const handleEdit = (message: Message) => {
@@ -196,13 +215,7 @@ export default function AdminPage() {
   };
 
   if (!isAuthenticated || isLoading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-pink-50 to-red-50">
-        <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
-          <div className="text-4xl">⚙️</div>
-        </motion.div>
-      </div>
-    );
+    return <LoadingScreen icon="⚙️" />;
   }
 
   return (
@@ -230,7 +243,7 @@ export default function AdminPage() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowModal(true)}
+              onClick={handleAddMessage}
               className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
             >
               + Add Message
@@ -460,9 +473,10 @@ export default function AdminPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {editingId ? 'Update' : 'Add'}
+                    {isSubmitting ? 'Saving...' : editingId ? 'Update' : 'Add'}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
