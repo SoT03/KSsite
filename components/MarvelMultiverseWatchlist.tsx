@@ -2,7 +2,25 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import {
+  IconMovie,
+  IconStar,
+  IconStarFilled,
+  IconLock,
+  IconCheck,
+  IconAlertCircle,
+  IconHeart,
+  IconCircleMinus,
+  IconSparkles,
+} from "@tabler/icons-react";
 import { ITEMS, ITEM_MAP, UNIVERSES, type UniverseId, type WatchItem } from "@/lib/marvel-watchlist-data";
+
+// Tabler icons render as SVG and default to currentColor for stroke/fill, so
+// the existing CSS classes (which just set `color`) keep working unchanged —
+// this just makes the icon glyph itself inherit the surrounding font-size.
+const ICON_STYLE = { width: "1em", height: "1em" } as const;
+
+type ViewId = UniverseId | "tier-list";
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -10,11 +28,12 @@ import { ITEMS, ITEM_MAP, UNIVERSES, type UniverseId, type WatchItem } from "@/l
 
 export default function MarvelMultiverseWatchlist() {
   const [watched, setWatched] = useState<Set<string>>(() => new Set());
+  const [ratings, setRatings] = useState<Record<string, number>>({});
   const [posters, setPosters] = useState<Record<string, string>>({});
-  const [activeTab, setActiveTab] = useState<UniverseId>("mcu");
+  const [activeTab, setActiveTab] = useState<ViewId>("mcu");
   const [loaded, setLoaded] = useState(false);
 
-  // Load this user's watch progress and cached poster art from the server on mount.
+  // Load this user's watch progress, ratings, and cached poster art from the server on mount.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -24,6 +43,7 @@ export default function MarvelMultiverseWatchlist() {
           const data = await watchlistRes.json();
           const ids: string[] = data.watchedItemIds ?? [];
           setWatched(new Set(ids.filter((id: string) => id in ITEM_MAP)));
+          setRatings(data.ratings ?? {});
         }
         if (!cancelled && postersRes.ok) {
           const data = await postersRes.json();
@@ -72,6 +92,16 @@ export default function MarvelMultiverseWatchlist() {
       }
       return next;
     });
+    if (!nextWatchedState) {
+      // Unwatching deletes the WatchedItem row server-side, which takes any rating with it —
+      // mirror that locally so the tier list doesn't show a stale rating for an unwatched item.
+      setRatings((prev) => {
+        if (!(item.id in prev)) return prev;
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
+    }
     fetch("/api/watchlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,6 +109,25 @@ export default function MarvelMultiverseWatchlist() {
     }).catch(() => {
       // Best-effort sync — local state already reflects the toggle so the UI stays responsive;
       // the next successful load will reconcile with the server if this write was lost.
+    });
+  };
+
+  const rateItem = (itemId: string, rating: number | null) => {
+    setRatings((prev) => {
+      if (rating === null) {
+        if (!(itemId in prev)) return prev;
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      }
+      return { ...prev, [itemId]: rating };
+    });
+    fetch("/api/watchlist/rating", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemId, rating }),
+    }).catch(() => {
+      // Best-effort sync — same reasoning as toggleWatched above.
     });
   };
 
@@ -116,6 +165,21 @@ export default function MarvelMultiverseWatchlist() {
     }
     return order.map((phase) => ({ phase, items: groups[phase] }));
   }, [activeTab]);
+
+  const ratedCount = useMemo(
+    () => Object.keys(ratings).filter((id) => watched.has(id)).length,
+    [ratings, watched]
+  );
+
+  const tierListGroups = useMemo(() => {
+    const buckets: Record<number, WatchItem[]> = { 5: [], 4: [], 3: [], 2: [], 1: [], 0: [] };
+    for (const item of ITEMS) {
+      if (!watched.has(item.id)) continue;
+      const rating = ratings[item.id] ?? 0;
+      buckets[rating].push(item);
+    }
+    return [5, 4, 3, 2, 1, 0].map((rating) => ({ rating, items: buckets[rating] })).filter((g) => g.items.length > 0);
+  }, [watched, ratings]);
 
   if (!loaded) {
     return (
@@ -178,12 +242,99 @@ export default function MarvelMultiverseWatchlist() {
                 </button>
               );
             })}
+
+            <button
+              type="button"
+              className={`mmw-tab mmw-tab--tier-list${activeTab === "tier-list" ? " mmw-tab--active" : ""}`}
+              onClick={() => setActiveTab("tier-list")}
+            >
+              <div className="mmw-tab-row">
+                <span className="mmw-tab-name">⭐ Tier List</span>
+                <span className="mmw-tab-count">
+                  {ratedCount}/{watchedCount}
+                </span>
+              </div>
+              <div className="mmw-progress-track mmw-progress-track--sm">
+                <div
+                  className="mmw-progress-fill"
+                  style={{ width: `${watchedCount === 0 ? 0 : Math.round((ratedCount / watchedCount) * 100)}%` }}
+                />
+              </div>
+            </button>
           </div>
         </div>
 
-        {/* Section 3: Movie Grid */}
+        {/* Section 3: Movie Grid / Tier List */}
         <div className="mmw-grid-col">
-          {groupedPhases.map(({ phase, items }) => {
+          {activeTab === "tier-list" ? (
+            tierListGroups.length === 0 ? (
+              <div className="mmw-phase-block">
+                <p className="mmw-tier-empty">
+                  Rate a movie you&apos;ve watched to start building your tier list — tap the stars on any watched
+                  poster.
+                </p>
+              </div>
+            ) : (
+              tierListGroups.map(({ rating, items }) => (
+                <div key={rating} className="mmw-phase-block">
+                  <div className="mmw-phase-header">
+                    <h4 className="mmw-phase-title mmw-phase-title--tier">
+                      {rating === 0 ? (
+                        "Unrated"
+                      ) : (
+                        <span className="mmw-tier-header-stars">
+                          {[1, 2, 3, 4, 5].map((n) =>
+                            n <= rating ? (
+                              <IconStarFilled key={n} className="mmw-tier-header-star--filled" style={ICON_STYLE} />
+                            ) : (
+                              <IconStar key={n} className="mmw-tier-header-star--empty" style={ICON_STYLE} />
+                            )
+                          )}
+                        </span>
+                      )}
+                    </h4>
+                    <span className="mmw-badge">{items.length}</span>
+                  </div>
+                  <div className="mmw-grid">
+                    {items.map((item) => {
+                      const rating = ratings[item.id] ?? 0;
+                      const posterUrl = posters[item.id];
+                      return (
+                        <div key={item.id} data-testid={`tier-${item.id}`} className="mmw-card-item mmw-card-item--tier">
+                          <div className="mmw-poster-slot">
+                            {posterUrl ? (
+                              <Image src={posterUrl} alt="" fill sizes="200px" className="mmw-poster-img" unoptimized />
+                            ) : (
+                              <div className="mmw-poster-fallback">
+                                <IconMovie style={ICON_STYLE} />
+                              </div>
+                            )}
+                          </div>
+                          <div className="mmw-card-title-strip">
+                            <span className="mmw-card-title">{item.title}</span>
+                          </div>
+                          <div className="mmw-star-row">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <button
+                                key={n}
+                                type="button"
+                                className={`mmw-star-btn${n <= rating ? " mmw-star-btn--filled" : ""}`}
+                                onClick={() => rateItem(item.id, rating === n ? null : n)}
+                                aria-label={`Rate ${n} star${n > 1 ? "s" : ""}`}
+                              >
+                                {n <= rating ? <IconStarFilled style={ICON_STYLE} /> : <IconStar style={ICON_STYLE} />}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )
+          ) : (
+            groupedPhases.map(({ phase, items }) => {
             const phaseComplete = items.every((item) => watched.has(item.id));
             return (
               <div key={phase} className="mmw-phase-block">
@@ -206,7 +357,7 @@ export default function MarvelMultiverseWatchlist() {
                           tabIndex={-1}
                         >
                           <div className="mmw-poster-slot mmw-poster-slot--locked">
-                            <i className="ti ti-lock mmw-lock-icon" title="Locked" />
+                            <IconLock className="mmw-lock-icon" style={ICON_STYLE} title="Locked" />
                           </div>
                           <div className="mmw-card-title-strip" />
                         </div>
@@ -237,18 +388,28 @@ export default function MarvelMultiverseWatchlist() {
                               alt=""
                               fill
                               sizes="200px"
-                              className="mmw-poster-img"
+                              className={`mmw-poster-img${watchedFlag ? " mmw-poster-img--watched" : ""}`}
                               unoptimized
                             />
                           ) : (
                             <div className="mmw-poster-fallback">
-                              <i className="ti ti-movie" />
+                              <IconMovie style={ICON_STYLE} />
+                            </div>
+                          )}
+                          {watchedFlag && (
+                            <div className="mmw-watched-stamp" title="Watched">
+                              <IconCheck style={ICON_STYLE} />
                             </div>
                           )}
                           <div className="mmw-card-badges">
-                            {watchedFlag && <i className="ti ti-check mmw-badge-icon mmw-badge-icon--success" title="Watched" />}
                             {recommended.length > 0 && (
-                              <i className="ti ti-alert-circle mmw-badge-icon mmw-badge-icon--warning" title="Has recommendations" />
+                              <IconAlertCircle className="mmw-badge-icon mmw-badge-icon--warning" style={ICON_STYLE} title="Has recommendations" />
+                            )}
+                            {item.tag === "together" && (
+                              <IconHeart className="mmw-badge-icon mmw-badge-icon--together" style={ICON_STYLE} title="Want to watch together" />
+                            )}
+                            {item.tag === "skip" && (
+                              <IconCircleMinus className="mmw-badge-icon mmw-badge-icon--skip" style={ICON_STYLE} title="Not that important" />
                             )}
                           </div>
                         </div>
@@ -265,12 +426,12 @@ export default function MarvelMultiverseWatchlist() {
                             <div className="mmw-card-hover-title">{item.title}</div>
                             {recommended.length > 0 && (
                               <div className="mmw-card-hover-line mmw-card-hover-line--warning">
-                                <i className="ti ti-alert-circle mmw-icon" /> Recommended: {recommended.join(", ")}
+                                <IconAlertCircle className="mmw-icon" style={ICON_STYLE} /> Recommended: {recommended.join(", ")}
                               </div>
                             )}
                             {nextUnlocks.length > 0 && (
                               <div className="mmw-card-hover-line mmw-card-hover-line--accent">
-                                <i className="ti ti-sparkles mmw-icon" /> Unlocks: {nextUnlocks.join(", ")}
+                                <IconSparkles className="mmw-icon" style={ICON_STYLE} /> Unlocks: {nextUnlocks.join(", ")}
                               </div>
                             )}
                           </div>
@@ -281,7 +442,8 @@ export default function MarvelMultiverseWatchlist() {
                 </div>
               </div>
             );
-          })}
+          })
+          )}
         </div>
       </div>
     </div>
@@ -432,6 +594,10 @@ const CSS = `
   border-color: var(--mmw-fill-accent);
 }
 
+.mmw-tab--tier-list {
+  margin-top: 0.5rem;
+}
+
 .mmw-tab-row {
   display: flex;
   align-items: center;
@@ -477,6 +643,20 @@ const CSS = `
   margin: 0;
 }
 
+.mmw-tier-header-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.mmw-tier-header-star--filled {
+  color: var(--mmw-text-warning);
+}
+
+.mmw-tier-header-star--empty {
+  color: var(--mmw-border);
+}
+
 .mmw-badge {
   font-size: 0.7rem;
   font-weight: 600;
@@ -515,6 +695,7 @@ const CSS = `
 }
 
 .mmw-card-item--watched {
+  border-width: 1.5px;
   border-color: var(--mmw-text-success);
 }
 
@@ -538,6 +719,29 @@ const CSS = `
 
 .mmw-poster-img {
   object-fit: cover;
+  transition: filter 0.2s ease;
+}
+
+.mmw-poster-img--watched {
+  filter: grayscale(0.55) brightness(0.6);
+}
+
+.mmw-watched-stamp {
+  position: absolute;
+  bottom: 0.4rem;
+  right: 0.4rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--mmw-text-success);
+  color: #0b0c10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  z-index: 2;
 }
 
 .mmw-poster-fallback {
@@ -594,6 +798,14 @@ const CSS = `
   color: var(--mmw-text-warning);
 }
 
+.mmw-badge-icon--together {
+  color: #f43f5e;
+}
+
+.mmw-badge-icon--skip {
+  color: var(--mmw-text-secondary);
+}
+
 .mmw-card-title-strip {
   padding: 0.5rem 0.55rem;
   min-height: 2.6rem;
@@ -611,13 +823,50 @@ const CSS = `
 }
 
 .mmw-card-title--watched {
-  text-decoration: line-through;
   color: var(--mmw-text-secondary);
 }
 
 .mmw-item-episodes {
   color: var(--mmw-text-secondary);
   font-weight: 400;
+}
+
+.mmw-card-item--tier {
+  cursor: default;
+}
+
+.mmw-star-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0 0.4rem 0.55rem;
+}
+
+.mmw-star-btn {
+  background: none;
+  border: none;
+  padding: 0.1rem;
+  cursor: pointer;
+  color: var(--mmw-border);
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.mmw-star-btn:hover {
+  transform: scale(1.2);
+}
+
+.mmw-star-btn--filled {
+  color: var(--mmw-text-warning);
+}
+
+.mmw-tier-empty {
+  color: var(--mmw-text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin: 0;
 }
 
 .mmw-icon {
