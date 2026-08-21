@@ -18,7 +18,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  openedBoxes BoxOpening[]
+  openedBoxes  BoxOpening[]
+  watchedItems WatchedItem[]
 }
 
 model Message {
@@ -49,4 +50,23 @@ model AnniversaryDate {
   id        String   @id @default(cuid())
   date      DateTime // Your anniversary date
   updatedAt DateTime @updatedAt
+}
+
+model WatchedItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String // matches the static WatchItem.id from lib/marvel-watchlist-data.ts
+  watchedAt DateTime @default(now())
+
+  @@unique([userId, itemId])
+}
+
+model PosterCache {
+  id         String   @id @default(cuid())
+  itemId     String   @unique // matches the static WatchItem.id from lib/marvel-watchlist-data.ts
+  tmdbId     Int?
+  mediaType  String? // "movie" or "tv"
+  posterPath String? // TMDB poster_path, e.g. "/abc123.jpg" — null means "looked up, no match found"
+  updatedAt  DateTime @updatedAt
 }

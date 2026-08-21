@@ -12,7 +12,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "posters:fetch": "tsx scripts/fetch-posters.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
