@@ -12,10 +12,12 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "posters:fetch": "tsx scripts/fetch-posters.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
+    "@tabler/icons-react": "^3.46.0",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^12.42.2",
     "jsonwebtoken": "^9.0.0",

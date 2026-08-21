@@ -29,6 +29,7 @@ export default function Navigation() {
   const navItems = [
     { href: '/', label: 'Start', icon: '❤️' },
     { href: '/this-year', label: 'Listy miłosne', icon: '💝' },
+    { href: '/marvel-watchlist', label: 'Marvel', icon: '🦸' },
     ...(userRole === 'admin' ? [{ href: '/admin', label: 'Admin', icon: '⚙️' }] : []),
   ];
 
