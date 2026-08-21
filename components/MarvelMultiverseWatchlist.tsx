@@ -28,6 +28,7 @@ type ViewId = UniverseId | "tier-list";
 export default function MarvelMultiverseWatchlist() {
   const [watched, setWatched] = useState<Set<string>>(() => new Set());
   const [tiers, setTiers] = useState<Record<string, string>>({});
+  const [orders, setOrders] = useState<Record<string, number>>({});
   const [posters, setPosters] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<ViewId>("mcu");
   const [loaded, setLoaded] = useState(false);
@@ -45,6 +46,7 @@ export default function MarvelMultiverseWatchlist() {
           const ids: string[] = data.watchedItemIds ?? [];
           setWatched(new Set(ids.filter((id: string) => id in ITEM_MAP)));
           setTiers(data.tiers ?? {});
+          setOrders(data.orders ?? {});
         }
         if (!cancelled && postersRes.ok) {
           const data = await postersRes.json();
@@ -94,9 +96,15 @@ export default function MarvelMultiverseWatchlist() {
       return next;
     });
     if (!nextWatchedState) {
-      // Unwatching deletes the WatchedItem row server-side, which takes its tier placement with
-      // it — mirror that locally so the tier list doesn't show a stale placement for an unwatched item.
+      // Unwatching deletes the WatchedItem row server-side, which takes its tier placement and
+      // order with it — mirror that locally so the tier list doesn't show a stale placement.
       setTiers((prev) => {
+        if (!(item.id in prev)) return prev;
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
+      setOrders((prev) => {
         if (!(item.id in prev)) return prev;
         const next = { ...prev };
         delete next[item.id];
@@ -138,6 +146,24 @@ export default function MarvelMultiverseWatchlist() {
     });
   };
 
+  const tierBoard = useMemo(() => {
+    const unrankedRaw: WatchItem[] = [];
+    const byTierRaw: Record<string, WatchItem[]> = {};
+    for (const t of TIERS) byTierRaw[t.key] = [];
+    for (const item of ITEMS) {
+      if (!watched.has(item.id)) continue;
+      const t = tiers[item.id];
+      if (t && byTierRaw[t]) byTierRaw[t].push(item);
+      else unrankedRaw.push(item);
+    }
+    const unranked = [...unrankedRaw].sort((a, b) => (orders[a.id] ?? 0) - (orders[b.id] ?? 0));
+    const byTier: Record<string, WatchItem[]> = {};
+    for (const t of TIERS) {
+      byTier[t.key] = [...byTierRaw[t.key]].sort((a, b) => (orders[a.id] ?? 0) - (orders[b.id] ?? 0));
+    }
+    return { unranked, byTier };
+  }, [watched, tiers, orders]);
+
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     e.dataTransfer.setData("text/plain", itemId);
     e.dataTransfer.effectAllowed = "move";
@@ -149,11 +175,69 @@ export default function MarvelMultiverseWatchlist() {
     setDragOverTier(null);
   };
 
+  const reorderTier = (tier: string | null, itemIds: string[]) => {
+    setTiers((prev) => {
+      const next = { ...prev };
+      for (const id of itemIds) {
+        if (tier === null) delete next[id];
+        else next[id] = tier;
+      }
+      return next;
+    });
+    setOrders((prev) => {
+      const next = { ...prev };
+      itemIds.forEach((id, index) => {
+        next[id] = index;
+      });
+      return next;
+    });
+    fetch("/api/watchlist/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tier, itemIds }),
+    }).catch(() => {
+      // Best-effort sync — same reasoning as toggleWatched above.
+    });
+  };
+
+  // Dropping onto a lane both moves the item into that tier and — by checking which sibling
+  // card the pointer landed on — decides where in the left-to-right order it lands, so dragging
+  // within a single tier reorders it instead of just re-confirming the same tier.
   const handleDropOnLane = (e: React.DragEvent, tier: string | null, laneKey: string) => {
     e.preventDefault();
-    const itemId = e.dataTransfer.getData("text/plain") || draggingId;
-    if (itemId) tierItem(itemId, tier);
     setDragOverTier((cur) => (cur === laneKey ? null : cur));
+
+    const draggedId = e.dataTransfer.getData("text/plain") || draggingId;
+    if (!draggedId) return;
+
+    if (tier === "best") {
+      // A single reserved slot — no meaningful left-to-right order to compute.
+      tierItem(draggedId, "best");
+      return;
+    }
+
+    const currentItems = (tier === null ? tierBoard.unranked : tierBoard.byTier[tier])
+      .map((it) => it.id)
+      .filter((id) => id !== draggedId);
+
+    const targetEl = (document.elementFromPoint(e.clientX, e.clientY) as Element | null)?.closest(
+      "[data-tier-card-id]"
+    );
+    const targetId = targetEl?.getAttribute("data-tier-card-id");
+
+    let newOrder: string[];
+    if (targetId && targetId !== draggedId && currentItems.includes(targetId)) {
+      const rect = targetEl!.getBoundingClientRect();
+      const isBefore = e.clientX < rect.left + rect.width / 2;
+      const targetIndex = currentItems.indexOf(targetId);
+      const insertAt = isBefore ? targetIndex : targetIndex + 1;
+      newOrder = [...currentItems.slice(0, insertAt), draggedId, ...currentItems.slice(insertAt)];
+    } else {
+      // Dropped on empty lane background (or on itself) — send it to the end.
+      newOrder = [...currentItems, draggedId];
+    }
+
+    reorderTier(tier, newOrder);
   };
 
   const totalCount = ITEMS.length;
@@ -196,25 +280,13 @@ export default function MarvelMultiverseWatchlist() {
     [tiers, watched]
   );
 
-  const tierBoard = useMemo(() => {
-    const unranked: WatchItem[] = [];
-    const byTier: Record<string, WatchItem[]> = {};
-    for (const t of TIERS) byTier[t.key] = [];
-    for (const item of ITEMS) {
-      if (!watched.has(item.id)) continue;
-      const t = tiers[item.id];
-      if (t && byTier[t]) byTier[t].push(item);
-      else unranked.push(item);
-    }
-    return { unranked, byTier };
-  }, [watched, tiers]);
-
   const renderTierCard = (item: WatchItem, removable: boolean) => {
     const posterUrl = posters[item.id];
     return (
       <div
         key={item.id}
         data-testid={`tier-${item.id}`}
+        data-tier-card-id={item.id}
         className={`mmw-card-item mmw-card-item--tier${draggingId === item.id ? " mmw-card-item--dragging" : ""}`}
         draggable
         onDragStart={(e) => handleDragStart(e, item.id)}
@@ -334,31 +406,6 @@ export default function MarvelMultiverseWatchlist() {
         <div className="mmw-grid-col">
           {activeTab === "tier-list" ? (
             <>
-              <div
-                data-testid="tier-lane-unranked"
-                className={`mmw-phase-block mmw-tier-lane${dragOverTier === "unranked" ? " mmw-tier-lane--over" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOverTier("unranked");
-                }}
-                onDragLeave={() => setDragOverTier((cur) => (cur === "unranked" ? null : cur))}
-                onDrop={(e) => handleDropOnLane(e, null, "unranked")}
-              >
-                <div className="mmw-phase-header">
-                  <h4 className="mmw-phase-title">Unranked</h4>
-                  <span className="mmw-badge">{tierBoard.unranked.length}</span>
-                </div>
-                {tierBoard.unranked.length === 0 ? (
-                  <p className="mmw-tier-empty">
-                    Everything you&apos;ve watched is already placed in a tier below.
-                  </p>
-                ) : (
-                  <div className="mmw-grid mmw-grid--tier">
-                    {tierBoard.unranked.map((item) => renderTierCard(item, false))}
-                  </div>
-                )}
-              </div>
-
               {TIERS.map((tierDef) => {
                 const items = tierBoard.byTier[tierDef.key];
                 return (
@@ -388,6 +435,31 @@ export default function MarvelMultiverseWatchlist() {
                   </div>
                 );
               })}
+
+              <div
+                data-testid="tier-lane-unranked"
+                className={`mmw-phase-block mmw-tier-lane${dragOverTier === "unranked" ? " mmw-tier-lane--over" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOverTier("unranked");
+                }}
+                onDragLeave={() => setDragOverTier((cur) => (cur === "unranked" ? null : cur))}
+                onDrop={(e) => handleDropOnLane(e, null, "unranked")}
+              >
+                <div className="mmw-phase-header">
+                  <h4 className="mmw-phase-title">Unranked</h4>
+                  <span className="mmw-badge">{tierBoard.unranked.length}</span>
+                </div>
+                {tierBoard.unranked.length === 0 ? (
+                  <p className="mmw-tier-empty">
+                    Everything you&apos;ve watched is already placed in a tier above.
+                  </p>
+                ) : (
+                  <div className="mmw-grid mmw-grid--tier">
+                    {tierBoard.unranked.map((item) => renderTierCard(item, false))}
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             groupedPhases.map(({ phase, items }) => {
@@ -652,6 +724,8 @@ const CSS = `
 
 .mmw-tab--tier-list {
   margin-top: 0.5rem;
+  border-top: 0.5px solid var(--mmw-border);
+  padding-top: 0.85rem;
 }
 
 .mmw-tab-row {
@@ -931,7 +1005,8 @@ const CSS = `
 }
 
 .mmw-grid--tier {
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 0.7rem;
 }
 
 .mmw-icon {

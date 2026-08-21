@@ -59,6 +59,7 @@ model WatchedItem {
   itemId    String // matches the static WatchItem.id from lib/marvel-watchlist-data.ts
   watchedAt DateTime @default(now())
   tier      String? // one of TIER_KEYS in lib/marvel-watchlist-data.ts, e.g. "best", "10-9"; null means unranked
+  order     Int      @default(0) // left-to-right rank within its tier (or within Unranked); lower sorts first
 
   @@unique([userId, itemId])
 }

@@ -22,13 +22,16 @@ export async function GET(request: NextRequest) {
     })
 
     const tiers: Record<string, string> = {}
+    const orders: Record<string, number> = {}
     for (const w of watchedItems) {
       if (w.tier != null) tiers[w.itemId] = w.tier
+      orders[w.itemId] = w.order
     }
 
     return NextResponse.json({
       watchedItemIds: watchedItems.map((w) => w.itemId),
       tiers,
+      orders,
     })
   } catch (error) {
     console.error('GET /api/watchlist error:', error)
