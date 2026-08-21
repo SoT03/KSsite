@@ -21,14 +21,14 @@ export async function GET(request: NextRequest) {
       where: { userId: payload.userId },
     })
 
-    const ratings: Record<string, number> = {}
+    const tiers: Record<string, string> = {}
     for (const w of watchedItems) {
-      if (w.rating != null) ratings[w.itemId] = w.rating
+      if (w.tier != null) tiers[w.itemId] = w.tier
     }
 
     return NextResponse.json({
       watchedItemIds: watchedItems.map((w) => w.itemId),
-      ratings,
+      tiers,
     })
   } catch (error) {
     console.error('GET /api/watchlist error:', error)

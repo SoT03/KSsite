@@ -35,6 +35,31 @@ export interface Universe {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Tier list bands                                                    */
+/* ------------------------------------------------------------------ */
+
+export interface TierDef {
+  key: string;
+  label: string;
+  /** max number of items allowed in this tier; undefined = unlimited */
+  max?: number;
+}
+
+// Ordered best to worst. "best" is a single reserved slot for a favorite —
+// placing a second item there bumps the previous occupant back to Unranked.
+export const TIERS: TierDef[] = [
+  { key: "best", label: "BEST", max: 1 },
+  { key: "10-9", label: "10 – 9" },
+  { key: "8.5-7.5", label: "8.5 – 7.5" },
+  { key: "7-6", label: "7 – 6" },
+  { key: "5.5-4", label: "5.5 – 4" },
+  { key: "3.5-2", label: "3.5 – 2" },
+  { key: "1", label: "1" },
+];
+
+export const TIER_KEYS = TIERS.map((t) => t.key);
+
+/* ------------------------------------------------------------------ */
 /*  Universe metadata                                                  */
 /* ------------------------------------------------------------------ */
 

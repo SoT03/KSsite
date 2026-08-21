@@ -58,7 +58,7 @@ model WatchedItem {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   itemId    String // matches the static WatchItem.id from lib/marvel-watchlist-data.ts
   watchedAt DateTime @default(now())
-  rating    Int? // 1-5 stars, set from the tier list; null means not rated yet
+  tier      String? // one of TIER_KEYS in lib/marvel-watchlist-data.ts, e.g. "best", "10-9"; null means unranked
 
   @@unique([userId, itemId])
 }
