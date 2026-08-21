@@ -34,6 +34,11 @@ export default function MarvelMultiverseWatchlist() {
   const [loaded, setLoaded] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverTier, setDragOverTier] = useState<string | null>(null);
+  const [pendingWatchItem, setPendingWatchItem] = useState<WatchItem | null>(null);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
+  const WATCH_CONFIRM_PASSWORD = "616";
 
   // Load this user's watch progress, tier placements, and cached poster art from the server on mount.
   useEffect(() => {
@@ -83,9 +88,38 @@ export default function MarvelMultiverseWatchlist() {
     return map;
   }, []);
 
-  const toggleWatched = (item: WatchItem) => {
-    if (!isWatched(item.id) && isLocked(item)) return;
-    const nextWatchedState = !isWatched(item.id);
+  // Marking something watched requires the confirmation password; unwatching (undoing a
+  // mistaken click) does not, so it goes straight through to applyWatchedChange.
+  const handleCardClick = (item: WatchItem) => {
+    if (isLocked(item)) return;
+    if (isWatched(item.id)) {
+      applyWatchedChange(item, false);
+      return;
+    }
+    setPasswordInput("");
+    setPasswordError(false);
+    setPendingWatchItem(item);
+  };
+
+  const confirmPendingWatch = () => {
+    if (!pendingWatchItem) return;
+    if (passwordInput !== WATCH_CONFIRM_PASSWORD) {
+      setPasswordError(true);
+      return;
+    }
+    applyWatchedChange(pendingWatchItem, true);
+    setPendingWatchItem(null);
+    setPasswordInput("");
+    setPasswordError(false);
+  };
+
+  const cancelPendingWatch = () => {
+    setPendingWatchItem(null);
+    setPasswordInput("");
+    setPasswordError(false);
+  };
+
+  const applyWatchedChange = (item: WatchItem, nextWatchedState: boolean) => {
     setWatched((prev) => {
       const next = new Set(prev);
       if (next.has(item.id)) {
@@ -504,7 +538,7 @@ export default function MarvelMultiverseWatchlist() {
                         key={item.id}
                         data-testid={item.id}
                         className={`mmw-card-item${watchedFlag ? " mmw-card-item--watched" : ""}`}
-                        onClick={() => toggleWatched(item)}
+                        onClick={() => handleCardClick(item)}
                         role="button"
                         aria-disabled={false}
                         tabIndex={0}
@@ -574,6 +608,40 @@ export default function MarvelMultiverseWatchlist() {
           )}
         </div>
       </div>
+
+      {pendingWatchItem && (
+        <div className="mmw-modal-overlay" onClick={cancelPendingWatch}>
+          <div className="mmw-modal" onClick={(e) => e.stopPropagation()}>
+            <h4 className="mmw-modal-title">Confirm watched</h4>
+            <p className="mmw-modal-text">
+              Enter the password to mark &quot;{pendingWatchItem.title}&quot; as watched.
+            </p>
+            <input
+              type="password"
+              className="mmw-modal-input"
+              value={passwordInput}
+              autoFocus
+              onChange={(e) => {
+                setPasswordInput(e.target.value);
+                setPasswordError(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmPendingWatch();
+                if (e.key === "Escape") cancelPendingWatch();
+              }}
+            />
+            {passwordError && <p className="mmw-modal-error">Incorrect password.</p>}
+            <div className="mmw-modal-actions">
+              <button type="button" className="mmw-modal-btn mmw-modal-btn--cancel" onClick={cancelPendingWatch}>
+                Cancel
+              </button>
+              <button type="button" className="mmw-modal-btn mmw-modal-btn--confirm" onClick={confirmPendingWatch}>
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1078,5 +1146,81 @@ const CSS = `
     flex: 1 1 auto;
     width: 100%;
   }
+}
+
+.mmw-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+
+.mmw-modal {
+  background: var(--mmw-surface-1);
+  border: 0.5px solid var(--mmw-border);
+  border-radius: var(--mmw-radius);
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.mmw-modal-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mmw-modal-text {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--mmw-text-secondary);
+}
+
+.mmw-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  border-radius: calc(var(--mmw-radius) - 4px);
+  border: 0.5px solid var(--mmw-border);
+  background: var(--mmw-surface-2);
+  color: var(--mmw-text-primary);
+  font-size: 0.9rem;
+}
+
+.mmw-modal-error {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.78rem;
+  color: var(--mmw-text-danger);
+}
+
+.mmw-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mmw-modal-btn {
+  border-radius: calc(var(--mmw-radius) - 4px);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 0.5px solid var(--mmw-border);
+}
+
+.mmw-modal-btn--cancel {
+  background: var(--mmw-surface-2);
+  color: var(--mmw-text-primary);
+}
+
+.mmw-modal-btn--confirm {
+  background: var(--mmw-fill-accent);
+  color: #fff;
+  border-color: var(--mmw-fill-accent);
 }
 `;
