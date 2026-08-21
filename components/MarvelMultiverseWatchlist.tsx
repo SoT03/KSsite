@@ -234,8 +234,8 @@ export default function MarvelMultiverseWatchlist() {
                             <Image
                               src={posterUrl}
                               alt=""
-                              width={32}
-                              height={48}
+                              width={80}
+                              height={120}
                               className="mmw-item-poster"
                               unoptimized
                             />
@@ -526,8 +526,8 @@ const CSS = `
 }
 
 .mmw-item-poster {
-  width: 32px;
-  height: 48px;
+  width: 80px;
+  height: 120px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
