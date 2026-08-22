@@ -39,7 +39,7 @@ export default function AdminPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
-  const [accountFormData, setAccountFormData] = useState({ name: '', email: '', password: '' });
+  const [accountFormData, setAccountFormData] = useState({ name: '', email: '', password: '', role: 'user' });
 
   const fetchMessages = async () => {
     try {
@@ -171,36 +171,44 @@ export default function AdminPage() {
     setFormData({ dayNumber: 1, content: '' });
   };
 
+  const handleAddAccount = () => {
+    setEditingAccountId(null);
+    setAccountFormData({ name: '', email: '', password: '', role: 'user' });
+    setShowAccountModal(true);
+  };
+
   const handleEditAccount = (account: Account) => {
     setEditingAccountId(account.id);
-    setAccountFormData({ name: account.name, email: account.email, password: '' });
+    setAccountFormData({ name: account.name, email: account.email, password: '', role: account.role });
     setShowAccountModal(true);
   };
 
   const handleCloseAccountModal = () => {
     setShowAccountModal(false);
     setEditingAccountId(null);
-    setAccountFormData({ name: '', email: '', password: '' });
+    setAccountFormData({ name: '', email: '', password: '', role: 'user' });
   };
 
   const handleAccountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingAccountId) return;
     setStatusMessage('');
 
     try {
-      const response = await fetch(`/api/users/${editingAccountId}`, {
-        method: 'PUT',
+      const url = editingAccountId ? `/api/users/${editingAccountId}` : '/api/users';
+      const method = editingAccountId ? 'PUT' : 'POST';
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: accountFormData.name,
           email: accountFormData.email,
+          role: accountFormData.role,
           ...(accountFormData.password && { password: accountFormData.password }),
         }),
       });
 
       if (response.ok) {
-        setStatusMessage('Account updated!');
+        setStatusMessage(editingAccountId ? 'Account updated!' : 'Account created!');
         handleCloseAccountModal();
         fetchAccounts();
         setTimeout(() => setStatusMessage(''), 3000);
@@ -209,8 +217,8 @@ export default function AdminPage() {
         setStatusMessage(error.error || 'Something went wrong');
       }
     } catch (error) {
-      console.error('Error updating account:', error);
-      setStatusMessage('Error updating account');
+      console.error('Error saving account:', error);
+      setStatusMessage('Error saving account');
     }
   };
 
@@ -247,6 +255,16 @@ export default function AdminPage() {
               className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
             >
               + Add Message
+            </motion.button>
+          )}
+          {tab === 'accounts' && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleAddAccount}
+              className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
+            >
+              + Add Account
             </motion.button>
           )}
         </motion.div>
@@ -511,7 +529,9 @@ export default function AdminPage() {
               onClick={(e) => e.stopPropagation()}
               className="backdrop-blur-xl bg-white/95 border border-white/40 rounded-2xl p-8 shadow-2xl max-w-md w-full"
             >
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Account</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                {editingAccountId ? 'Edit Account' : 'Add Account'}
+              </h2>
 
               <form onSubmit={handleAccountSubmit} className="space-y-4">
                 <div>
@@ -542,13 +562,35 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    New Password
+                    Role
+                  </label>
+                  <select
+                    value={accountFormData.role}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, role: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="marvel">Marvel only</option>
+                  </select>
+                  {accountFormData.role === 'marvel' && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      This account will only be able to see the Marvel watchlist page.
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {editingAccountId ? 'New Password' : 'Password'}
                   </label>
                   <input
                     type="password"
                     value={accountFormData.password}
                     onChange={(e) => setAccountFormData({ ...accountFormData, password: e.target.value })}
-                    placeholder="Leave blank to keep current password"
+                    placeholder={editingAccountId ? 'Leave blank to keep current password' : ''}
+                    required={!editingAccountId}
+                    minLength={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                   />
                 </div>
@@ -560,7 +602,7 @@ export default function AdminPage() {
                     type="submit"
                     className="flex-1 px-4 py-2 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition"
                   >
-                    Save
+                    {editingAccountId ? 'Save' : 'Create'}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
