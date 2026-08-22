@@ -26,12 +26,17 @@ export default function Navigation() {
 
   const isActive = (path: string) => pathname === path;
 
-  const navItems = [
-    { href: '/', label: 'Start', icon: '❤️' },
-    { href: '/this-year', label: 'Listy miłosne', icon: '💝' },
-    { href: '/marvel-watchlist', label: 'Marvel', icon: '🦸' },
-    ...(userRole === 'admin' ? [{ href: '/admin', label: 'Admin', icon: '⚙️' }] : []),
-  ];
+  // The "marvel" role is restricted (server-side, in proxy.ts) to only the Marvel
+  // watchlist page, so its nav mirrors that instead of showing links it can't use.
+  const navItems =
+    userRole === 'marvel'
+      ? [{ href: '/marvel-watchlist', label: 'Marvel', icon: '🦸' }]
+      : [
+          { href: '/', label: 'Start', icon: '❤️' },
+          { href: '/this-year', label: 'Listy miłosne', icon: '💝' },
+          { href: '/marvel-watchlist', label: 'Marvel', icon: '🦸' },
+          ...(userRole === 'admin' ? [{ href: '/admin', label: 'Admin', icon: '⚙️' }] : []),
+        ];
 
   useEffect(() => {
     const measure = () => {

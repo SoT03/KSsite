@@ -6,10 +6,12 @@ import bcrypt from 'bcryptjs'
 const SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 const BCRYPT_ROUNDS = 10
 
+export type UserRole = 'admin' | 'user' | 'marvel'
+
 export interface TokenPayload {
   userId: string
   email: string
-  role: 'admin' | 'user'
+  role: UserRole
 }
 
 export function createToken(payload: TokenPayload): string {

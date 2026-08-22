@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken, hashPassword } from '@/lib/auth'
 
+const VALID_ROLES = ['admin', 'user', 'marvel']
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -21,7 +23,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { name, email, password } = body
+    const { name, email, password, role } = body
 
     if (email !== undefined && !email) {
       return NextResponse.json(
@@ -37,12 +39,20 @@ export async function PUT(
       )
     }
 
+    if (role !== undefined && !VALID_ROLES.includes(role)) {
+      return NextResponse.json(
+        { error: 'Invalid role' },
+        { status: 400 }
+      )
+    }
+
     const user = await prisma.user.update({
       where: { id },
       data: {
         ...(name && { name }),
         ...(email && { email }),
         ...(password && { password: await hashPassword(password) }),
+        ...(role && { role }),
       },
       select: { id: true, email: true, name: true, role: true },
     })

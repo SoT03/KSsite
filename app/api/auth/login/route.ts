@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createToken, verifyPassword } from '@/lib/auth'
+import { createToken, verifyPassword, type UserRole } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const token = createToken({
       userId: user.id,
       email: user.email,
-      role: user.role as 'admin' | 'user',
+      role: user.role as UserRole,
     })
 
     const response = NextResponse.json({
