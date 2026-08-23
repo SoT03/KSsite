@@ -48,7 +48,7 @@ export default function AdminPage() {
       setMessages(data.messages || []);
     } catch (error) {
       console.error('Error fetching messages:', error);
-      setStatusMessage('Failed to load messages');
+      setStatusMessage('Nie udało się wczytać wiadomości');
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +61,7 @@ export default function AdminPage() {
       setAccounts(data.users || []);
     } catch (error) {
       console.error('Error fetching accounts:', error);
-      setStatusMessage('Failed to load accounts');
+      setStatusMessage('Nie udało się wczytać kont');
     }
   };
 
@@ -111,7 +111,7 @@ export default function AdminPage() {
             ? prev.map((m) => (m.id === saved.id ? saved : m))
             : [...prev, saved]
         );
-        setStatusMessage(editingId ? 'Message updated!' : 'Message added!');
+        setStatusMessage(editingId ? 'Wiadomość zaktualizowana!' : 'Wiadomość dodana!');
         setShowModal(false);
         setEditingId(null);
         setFormData({ dayNumber: 1, content: '' });
@@ -119,11 +119,11 @@ export default function AdminPage() {
         setTimeout(() => setStatusMessage(''), 3000);
       } else {
         const error = await response.json();
-        setStatusMessage(error.error || 'Something went wrong');
+        setStatusMessage(error.error || 'Coś poszło nie tak');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      setStatusMessage('Error saving message');
+      setStatusMessage('Błąd zapisu wiadomości');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,7 +147,7 @@ export default function AdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    if (!confirm('Czy na pewno chcesz usunąć tę wiadomość?')) return;
 
     try {
       const response = await fetch(`/api/messages/${id}`, {
@@ -155,13 +155,13 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        setStatusMessage('Message deleted!');
+        setStatusMessage('Wiadomość usunięta!');
         fetchMessages();
         setTimeout(() => setStatusMessage(''), 3000);
       }
     } catch (error) {
       console.error('Error deleting message:', error);
-      setStatusMessage('Error deleting message');
+      setStatusMessage('Błąd usuwania wiadomości');
     }
   };
 
@@ -208,17 +208,17 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        setStatusMessage(editingAccountId ? 'Account updated!' : 'Account created!');
+        setStatusMessage(editingAccountId ? 'Konto zaktualizowane!' : 'Konto utworzone!');
         handleCloseAccountModal();
         fetchAccounts();
         setTimeout(() => setStatusMessage(''), 3000);
       } else {
         const error = await response.json();
-        setStatusMessage(error.error || 'Something went wrong');
+        setStatusMessage(error.error || 'Coś poszło nie tak');
       }
     } catch (error) {
       console.error('Error saving account:', error);
-      setStatusMessage('Error saving account');
+      setStatusMessage('Błąd zapisu konta');
     }
   };
 
@@ -241,10 +241,10 @@ export default function AdminPage() {
         >
           <div>
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Admin Panel
+              Panel administratora
             </h1>
             <p className="text-gray-600">
-              Manage messages and accounts
+              Zarządzaj wiadomościami i kontami
             </p>
           </div>
           {tab === 'messages' && (
@@ -254,7 +254,7 @@ export default function AdminPage() {
               onClick={handleAddMessage}
               className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
             >
-              + Add Message
+              + Dodaj wiadomość
             </motion.button>
           )}
           {tab === 'accounts' && (
@@ -264,7 +264,7 @@ export default function AdminPage() {
               onClick={handleAddAccount}
               className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition"
             >
-              + Add Account
+              + Dodaj konto
             </motion.button>
           )}
         </motion.div>
@@ -280,7 +280,7 @@ export default function AdminPage() {
                 ${tab === t ? 'bg-linear-to-r from-rose-500 to-pink-500 text-white shadow-md' : 'text-gray-700 hover:text-rose-600'}
               `}
             >
-              {t === 'messages' ? '💌 Messages' : '👤 Accounts'}
+              {t === 'messages' ? '💌 Wiadomości' : '👤 Konta'}
             </button>
           ))}
         </div>
@@ -309,8 +309,8 @@ export default function AdminPage() {
           >
             {messages.length === 0 ? (
               <div className="p-8 text-center text-gray-600">
-                <p className="text-lg mb-4">No messages yet</p>
-                <p className="text-sm">Click &quot;Add Message&quot; to get started</p>
+                <p className="text-lg mb-4">Brak wiadomości</p>
+                <p className="text-sm">Kliknij &quot;Dodaj wiadomość&quot;, aby zacząć</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -318,13 +318,13 @@ export default function AdminPage() {
                   <thead>
                     <tr className="border-b border-white/40 bg-white/20">
                       <th className="px-6 py-4 text-left font-semibold text-gray-700">
-                        Day
+                        Dzień
                       </th>
                       <th className="px-6 py-4 text-left font-semibold text-gray-700">
-                        Message
+                        Wiadomość
                       </th>
                       <th className="px-6 py-4 text-right font-semibold text-gray-700">
-                        Actions
+                        Akcje
                       </th>
                     </tr>
                   </thead>
@@ -341,7 +341,7 @@ export default function AdminPage() {
                         >
                           <td className="px-6 py-4">
                             <span className="inline-block px-3 py-1 bg-rose-200/50 text-rose-700 rounded-full font-semibold">
-                              Day {message.dayNumber}
+                              Dzień {message.dayNumber}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-gray-700">
@@ -354,7 +354,7 @@ export default function AdminPage() {
                               onClick={() => handleEdit(message)}
                               className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
                             >
-                              Edit
+                              Edytuj
                             </motion.button>
                             <motion.button
                               whileHover={{ scale: 1.1 }}
@@ -362,7 +362,7 @@ export default function AdminPage() {
                               onClick={() => handleDelete(message.id)}
                               className="inline-block px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
                             >
-                              Delete
+                              Usuń
                             </motion.button>
                           </td>
                         </motion.tr>
@@ -384,10 +384,10 @@ export default function AdminPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/40 bg-white/20">
-                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Name</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Username / Email</th>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Role</th>
-                    <th className="px-6 py-4 text-right font-semibold text-gray-700">Actions</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Imię</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Nazwa użytkownika / e-mail</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Rola</th>
+                    <th className="px-6 py-4 text-right font-semibold text-gray-700">Akcje</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -413,7 +413,7 @@ export default function AdminPage() {
                           onClick={() => handleEditAccount(account)}
                           className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
                         >
-                          Edit
+                          Edytuj
                         </motion.button>
                       </td>
                     </motion.tr>
@@ -443,13 +443,13 @@ export default function AdminPage() {
               className="backdrop-blur-xl bg-white/95 border border-white/40 rounded-2xl p-8 shadow-2xl max-w-md w-full"
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                {editingId ? 'Edit Message' : 'Add Message'}
+                {editingId ? 'Edytuj wiadomość' : 'Dodaj wiadomość'}
               </h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Day Number (1-365)
+                    Numer dnia (1-365)
                   </label>
                   <input
                     type="number"
@@ -469,7 +469,7 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Message (e.g., &quot;your beautiful smile&quot;)
+                    Wiadomość (np. &quot;twój piękny uśmiech&quot;)
                   </label>
                   <textarea
                     value={formData.content}
@@ -480,7 +480,7 @@ export default function AdminPage() {
                       })
                     }
                     required
-                    placeholder="Type the reason why you love her..."
+                    placeholder="Wpisz powód, dla którego ją kochasz..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"
                     rows={3}
                   ></textarea>
@@ -494,7 +494,7 @@ export default function AdminPage() {
                     disabled={isSubmitting}
                     className="flex-1 px-4 py-2 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? 'Saving...' : editingId ? 'Update' : 'Add'}
+                    {isSubmitting ? 'Zapisywanie...' : editingId ? 'Zaktualizuj' : 'Dodaj'}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -503,7 +503,7 @@ export default function AdminPage() {
                     onClick={handleCloseModal}
                     className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition"
                   >
-                    Cancel
+                    Anuluj
                   </motion.button>
                 </div>
               </form>
@@ -530,13 +530,13 @@ export default function AdminPage() {
               className="backdrop-blur-xl bg-white/95 border border-white/40 rounded-2xl p-8 shadow-2xl max-w-md w-full"
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                {editingAccountId ? 'Edit Account' : 'Add Account'}
+                {editingAccountId ? 'Edytuj konto' : 'Dodaj konto'}
               </h2>
 
               <form onSubmit={handleAccountSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Display Name
+                    Wyświetlana nazwa
                   </label>
                   <input
                     type="text"
@@ -549,7 +549,7 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username / Email
+                    Nazwa użytkownika / e-mail
                   </label>
                   <input
                     type="text"
@@ -562,33 +562,33 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role
+                    Rola
                   </label>
                   <select
                     value={accountFormData.role}
                     onChange={(e) => setAccountFormData({ ...accountFormData, role: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                   >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    <option value="marvel">Marvel only</option>
+                    <option value="user">Użytkownik</option>
+                    <option value="admin">Administrator</option>
+                    <option value="marvel">Tylko Marvel</option>
                   </select>
                   {accountFormData.role === 'marvel' && (
                     <p className="mt-1 text-xs text-gray-500">
-                      This account will only be able to see the Marvel watchlist page.
+                      To konto będzie mogło zobaczyć tylko stronę z listą Marvela.
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {editingAccountId ? 'New Password' : 'Password'}
+                    {editingAccountId ? 'Nowe hasło' : 'Hasło'}
                   </label>
                   <input
                     type="password"
                     value={accountFormData.password}
                     onChange={(e) => setAccountFormData({ ...accountFormData, password: e.target.value })}
-                    placeholder={editingAccountId ? 'Leave blank to keep current password' : ''}
+                    placeholder={editingAccountId ? 'Zostaw puste, aby zachować obecne hasło' : ''}
                     required={!editingAccountId}
                     minLength={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
@@ -602,7 +602,7 @@ export default function AdminPage() {
                     type="submit"
                     className="flex-1 px-4 py-2 bg-linear-to-r from-rose-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition"
                   >
-                    {editingAccountId ? 'Save' : 'Create'}
+                    {editingAccountId ? 'Zapisz' : 'Utwórz'}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -611,7 +611,7 @@ export default function AdminPage() {
                     onClick={handleCloseAccountModal}
                     className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition"
                   >
-                    Cancel
+                    Anuluj
                   </motion.button>
                 </div>
               </form>

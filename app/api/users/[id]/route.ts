@@ -27,21 +27,21 @@ export async function PUT(
 
     if (email !== undefined && !email) {
       return NextResponse.json(
-        { error: 'Username/email cannot be empty' },
+        { error: 'Nazwa użytkownika/e-mail nie może być pusta' },
         { status: 400 }
       )
     }
 
     if (password !== undefined && password.length < 4) {
       return NextResponse.json(
-        { error: 'Password must be at least 4 characters' },
+        { error: 'Hasło musi mieć co najmniej 4 znaki' },
         { status: 400 }
       )
     }
 
     if (role !== undefined && !VALID_ROLES.includes(role)) {
       return NextResponse.json(
-        { error: 'Invalid role' },
+        { error: 'Nieprawidłowa rola' },
         { status: 400 }
       )
     }

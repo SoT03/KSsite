@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (!messageId) {
       return NextResponse.json(
-        { error: 'messageId is required' },
+        { error: 'messageId jest wymagane' },
         { status: 400 }
       )
     }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (!message) {
       return NextResponse.json(
-        { error: 'Message not found' },
+        { error: 'Nie znaleziono wiadomości' },
         { status: 404 }
       )
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     if (existingOpening) {
       return NextResponse.json(
-        { error: 'Box already opened' },
+        { error: 'Pudełko zostało już otwarte' },
         { status: 400 }
       )
     }
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     if (openedToday) {
       return NextResponse.json(
-        { error: "You've already opened a box today. Come back tomorrow!" },
+        { error: 'Otworzyłaś już dzisiaj pudełko. Wróć jutro!' },
         { status: 403 }
       )
     }

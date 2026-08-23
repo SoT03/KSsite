@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Nazwa użytkownika i hasło są wymagane' },
         { status: 400 }
       )
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Nieprawidłowa nazwa użytkownika lub hasło' },
         { status: 401 }
       )
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Nieprawidłowa nazwa użytkownika lub hasło' },
         { status: 401 }
       )
     }

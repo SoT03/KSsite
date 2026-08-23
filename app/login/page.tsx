@@ -34,7 +34,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Login failed');
+        setError(data.error || 'Logowanie nie powiodło się');
         setIsLoading(false);
         return;
       }
@@ -45,7 +45,7 @@ export default function LoginPage() {
 
       router.push('/');
     } catch {
-      setError('An error occurred. Please try again.');
+      setError('Wystąpił błąd. Spróbuj ponownie.');
       setIsLoading(false);
     }
   };
@@ -70,7 +70,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-4xl font-bold text-center text-rose-600 mb-2"
             >
-              Our Love
+              Nasza Miłość
             </motion.h1>
 
             <motion.p
@@ -79,7 +79,7 @@ export default function LoginPage() {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-center text-gray-600 mb-8"
             >
-              Sign in to begin
+              Zaloguj się, aby zacząć
             </motion.p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,13 +89,13 @@ export default function LoginPage() {
                 transition={{ delay: 0.4, duration: 0.6 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
+                  Nazwa użytkownika
                 </label>
                 <input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your username"
+                  placeholder="twoja nazwa użytkownika"
                   required
                   className="w-full px-4 py-3 rounded-xl bg-white/50 backdrop-blur border border-white/40 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition placeholder-gray-400 text-gray-900"
                 />
@@ -107,7 +107,7 @@ export default function LoginPage() {
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                  Hasło
                 </label>
                 <input
                   type="password"
@@ -139,7 +139,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="w-full py-3 rounded-xl bg-linear-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? 'Logowanie...' : 'Zaloguj się'}
               </motion.button>
             </form>
           </div>

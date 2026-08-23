@@ -50,21 +50,21 @@ export async function POST(request: NextRequest) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Name, username/email, and password are required' },
+        { error: 'Imię, nazwa użytkownika/e-mail i hasło są wymagane' },
         { status: 400 }
       )
     }
 
     if (password.length < 4) {
       return NextResponse.json(
-        { error: 'Password must be at least 4 characters' },
+        { error: 'Hasło musi mieć co najmniej 4 znaki' },
         { status: 400 }
       )
     }
 
     if (role !== undefined && !VALID_ROLES.includes(role)) {
       return NextResponse.json(
-        { error: 'Invalid role' },
+        { error: 'Nieprawidłowa rola' },
         { status: 400 }
       )
     }
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       (error as { code: string }).code === 'P2002'
     ) {
       return NextResponse.json(
-        { error: 'An account with this username/email already exists' },
+        { error: 'Konto z tą nazwą użytkownika/e-mailem już istnieje' },
         { status: 400 }
       )
     }

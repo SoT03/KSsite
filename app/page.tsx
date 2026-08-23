@@ -202,7 +202,7 @@ export default function DashboardPage() {
           className="text-center mt-12 md:mt-16 text-gray-600"
         >
           <p className="text-sm md:text-base">
-            Built with ❤️ for someone special
+            Stworzone z ❤️ dla kogoś wyjątkowego
           </p>
         </motion.div>
       </div>

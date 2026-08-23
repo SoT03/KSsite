@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     if (!dayNumber || !content) {
       return NextResponse.json(
-        { error: 'dayNumber and content are required' },
+        { error: 'Numer dnia i treść są wymagane' },
         { status: 400 }
       )
     }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       (error as { code: string }).code === 'P2002'
     ) {
       return NextResponse.json(
-        { error: 'A message already exists for this day' },
+        { error: 'Wiadomość na ten dzień już istnieje' },
         { status: 400 }
       )
     }

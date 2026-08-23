@@ -322,6 +322,7 @@ export default function MarvelMultiverseWatchlist() {
         data-testid={`tier-${item.id}`}
         data-tier-card-id={item.id}
         className={`mmw-card-item mmw-card-item--tier${draggingId === item.id ? " mmw-card-item--dragging" : ""}`}
+        title={item.title}
         draggable
         onDragStart={(e) => handleDragStart(e, item.id)}
         onDragEnd={handleDragEnd}
@@ -357,7 +358,7 @@ export default function MarvelMultiverseWatchlist() {
     return (
       <div className="mmw-root">
         <style>{CSS}</style>
-        <div className="mmw-card mmw-global-card">Loading your watchlist…</div>
+        <div className="mmw-card mmw-global-card">Ładowanie Twojej listy…</div>
       </div>
     );
   }
@@ -369,9 +370,9 @@ export default function MarvelMultiverseWatchlist() {
       {/* Section 1: Global Progress */}
       <div className="mmw-card mmw-global-card">
         <div className="mmw-global-header">
-          <h2 className="mmw-heading">Multiverse Progress</h2>
+          <h2 className="mmw-heading">Postęp Multiwersum</h2>
           <span className="mmw-global-count">
-            {watchedCount} of {totalCount}
+            {watchedCount} z {totalCount}
           </span>
         </div>
         <div className="mmw-progress-track mmw-progress-track--lg">
@@ -380,7 +381,7 @@ export default function MarvelMultiverseWatchlist() {
             style={{ width: `${globalPercent}%` }}
           />
         </div>
-        <div className="mmw-global-percent">{globalPercent}% complete</div>
+        <div className="mmw-global-percent">{globalPercent}% ukończone</div>
       </div>
 
       <div className="mmw-layout">
@@ -437,7 +438,7 @@ export default function MarvelMultiverseWatchlist() {
         </div>
 
         {/* Section 3: Movie Grid / Tier List */}
-        <div className="mmw-grid-col">
+        <div className={`mmw-grid-col${activeTab === "tier-list" ? " mmw-grid-col--tier" : ""}`}>
           {activeTab === "tier-list" ? (
             <>
               {TIERS.map((tierDef) => {
@@ -502,7 +503,7 @@ export default function MarvelMultiverseWatchlist() {
               <div key={phase} className="mmw-phase-block">
                 <div className="mmw-phase-header">
                   <h4 className="mmw-phase-title">{phase}</h4>
-                  {phaseComplete && <span className="mmw-badge mmw-badge--success">Complete</span>}
+                  {phaseComplete && <span className="mmw-badge mmw-badge--success">Ukończono</span>}
                 </div>
                 <div className="mmw-grid">
                   {items.map((item) => {
@@ -519,7 +520,7 @@ export default function MarvelMultiverseWatchlist() {
                           tabIndex={-1}
                         >
                           <div className="mmw-poster-slot mmw-poster-slot--locked">
-                            <IconLock className="mmw-lock-icon" style={ICON_STYLE} title="Locked" />
+                            <IconLock className="mmw-lock-icon" style={ICON_STYLE} title="Zablokowane" />
                           </div>
                           <div className="mmw-card-title-strip" />
                         </div>
@@ -559,19 +560,19 @@ export default function MarvelMultiverseWatchlist() {
                             </div>
                           )}
                           {watchedFlag && (
-                            <div className="mmw-watched-stamp" title="Watched">
+                            <div className="mmw-watched-stamp" title="Obejrzane">
                               <IconCheck style={ICON_STYLE} />
                             </div>
                           )}
                           <div className="mmw-card-badges">
                             {recommended.length > 0 && (
-                              <IconAlertCircle className="mmw-badge-icon mmw-badge-icon--warning" style={ICON_STYLE} title="Has recommendations" />
+                              <IconAlertCircle className="mmw-badge-icon mmw-badge-icon--warning" style={ICON_STYLE} title="Ma rekomendacje" />
                             )}
                             {item.tag === "together" && (
-                              <IconHeart className="mmw-badge-icon mmw-badge-icon--together" style={ICON_STYLE} title="Want to watch together" />
+                              <IconHeart className="mmw-badge-icon mmw-badge-icon--together" style={ICON_STYLE} title="Obejrzeć razem" />
                             )}
                             {item.tag === "skip" && (
-                              <IconCircleMinus className="mmw-badge-icon mmw-badge-icon--skip" style={ICON_STYLE} title="Not that important" />
+                              <IconCircleMinus className="mmw-badge-icon mmw-badge-icon--skip" style={ICON_STYLE} title="Nieistotne" />
                             )}
                           </div>
                         </div>
@@ -588,12 +589,12 @@ export default function MarvelMultiverseWatchlist() {
                             <div className="mmw-card-hover-title">{item.title}</div>
                             {recommended.length > 0 && (
                               <div className="mmw-card-hover-line mmw-card-hover-line--warning">
-                                <IconAlertCircle className="mmw-icon" style={ICON_STYLE} /> Recommended: {recommended.join(", ")}
+                                <IconAlertCircle className="mmw-icon" style={ICON_STYLE} /> Polecane: {recommended.join(", ")}
                               </div>
                             )}
                             {nextUnlocks.length > 0 && (
                               <div className="mmw-card-hover-line mmw-card-hover-line--accent">
-                                <IconSparkles className="mmw-icon" style={ICON_STYLE} /> Unlocks: {nextUnlocks.join(", ")}
+                                <IconSparkles className="mmw-icon" style={ICON_STYLE} /> Odblokowuje: {nextUnlocks.join(", ")}
                               </div>
                             )}
                           </div>
@@ -612,9 +613,9 @@ export default function MarvelMultiverseWatchlist() {
       {pendingWatchItem && (
         <div className="mmw-modal-overlay" onClick={cancelPendingWatch}>
           <div className="mmw-modal" onClick={(e) => e.stopPropagation()}>
-            <h4 className="mmw-modal-title">Confirm watched</h4>
+            <h4 className="mmw-modal-title">Potwierdź obejrzenie</h4>
             <p className="mmw-modal-text">
-              Enter the password to mark &quot;{pendingWatchItem.title}&quot; as watched.
+              Wpisz hasło, aby oznaczyć &quot;{pendingWatchItem.title}&quot; jako obejrzane.
             </p>
             <input
               type="password"
@@ -630,13 +631,13 @@ export default function MarvelMultiverseWatchlist() {
                 if (e.key === "Escape") cancelPendingWatch();
               }}
             />
-            {passwordError && <p className="mmw-modal-error">Incorrect password.</p>}
+            {passwordError && <p className="mmw-modal-error">Nieprawidłowe hasło.</p>}
             <div className="mmw-modal-actions">
               <button type="button" className="mmw-modal-btn mmw-modal-btn--cancel" onClick={cancelPendingWatch}>
-                Cancel
+                Anuluj
               </button>
               <button type="button" className="mmw-modal-btn mmw-modal-btn--confirm" onClick={confirmPendingWatch}>
-                Confirm
+                Potwierdź
               </button>
             </div>
           </div>
@@ -1075,6 +1076,52 @@ const CSS = `
 .mmw-grid--tier {
   grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
   gap: 0.7rem;
+}
+
+/* Compact tier-list layout: tighter lane spacing and smaller cards make it
+   easier to see and hit a drop target instead of scrolling past huge gaps. */
+.mmw-grid-col--tier {
+  gap: 0.45rem;
+}
+
+.mmw-grid-col--tier .mmw-tier-lane {
+  padding: 0.5rem 0.65rem;
+}
+
+.mmw-grid-col--tier .mmw-phase-header {
+  margin-bottom: 0.35rem;
+}
+
+.mmw-grid-col--tier .mmw-phase-title {
+  font-size: 0.8rem;
+}
+
+.mmw-grid-col--tier .mmw-tier-empty {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.mmw-grid-col--tier .mmw-grid--tier {
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 0.4rem;
+}
+
+.mmw-grid-col--tier .mmw-card-title-strip {
+  padding: 0.3rem 0.35rem;
+  min-height: 1.7rem;
+}
+
+.mmw-grid-col--tier .mmw-card-title {
+  font-size: 0.62rem;
+  -webkit-line-clamp: 1;
+}
+
+.mmw-grid-col--tier .mmw-tier-remove-btn {
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  top: 0.25rem;
+  right: 0.25rem;
 }
 
 .mmw-icon {
