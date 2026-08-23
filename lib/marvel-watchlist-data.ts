@@ -1,6 +1,6 @@
 // lib/marvel-watchlist-data.ts
 //
-// Shared source of truth for the Marvel Multiverse Watchlist: the 94-item
+// Shared source of truth for the Marvel Multiverse Watchlist: the 102-item
 // list, unlock graph, and universe metadata. Imported by both the client
 // component and server-side code (poster fetch script, API routes) so the
 // two never drift apart.
@@ -25,8 +25,8 @@ export interface WatchItem {
   episodes?: number;
   /** which TMDB endpoint to search (movie vs. tv) when resolving poster art */
   mediaType: "movie" | "tv";
-  /** "together" = want to watch together, "skip" = not that important */
-  tag?: "together" | "skip";
+  /** "together" = want to watch together, "skip" = not that important, "one-shot" = short bonus film */
+  tag?: "together" | "skip" | "one-shot";
 }
 
 export interface Universe {
@@ -72,26 +72,50 @@ export const UNIVERSES: Universe[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Item data (94 entries)                                             */
+/*  Item data (102 entries)                                            */
 /* ------------------------------------------------------------------ */
 
 export const ITEMS: WatchItem[] = [
   /* ---------------------------- MCU — Phase 1 ---------------------------- */
   { id: "mcu-cap-america-1", title: "Captain America: The First Avenger", universe: "mcu", phase: "Phase 1", mediaType: "movie", tag: "together" },
+  { id: "mcu-agent-carter-s1", title: "Agent Carter Season 1", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], episodes: 8, mediaType: "tv" },
+  { id: "mcu-agent-carter-s2", title: "Agent Carter Season 2", universe: "mcu", phase: "Phase 1", requires: ["mcu-agent-carter-s1"], episodes: 10, mediaType: "tv" },
   { id: "mcu-captain-marvel", title: "Captain Marvel", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie" },
   { id: "mcu-iron-man-1", title: "Iron Man", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-iron-man-2", title: "Iron Man 2", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-hulk", title: "The Incredible Hulk", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", tag: "together" },
+  { id: "mcu-thor-one-shot", title: "A Funny Thing Happened on the Way to Thor's Hammer", universe: "mcu", phase: "Phase 1", requires: ["mcu-thor-1"], mediaType: "movie", tag: "one-shot" },
   { id: "mcu-thor-1", title: "Thor", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-1", "mcu-hulk"], mediaType: "movie", tag: "together" },
+  { id: "mcu-the-consultant", title: "The Consultant", universe: "mcu", phase: "Phase 1", requires: ["mcu-thor-1"], mediaType: "movie", tag: "one-shot" },
   { id: "mcu-avengers-1", title: "The Avengers", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-2", "mcu-thor-1"], mediaType: "movie", tag: "together" },
+  { id: "mcu-item-47", title: "Item 47", universe: "mcu", phase: "Phase 1", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "one-shot" },
 
   /* ---------------------------- MCU — Phase 2 ---------------------------- */
   { id: "mcu-thor-dark-world", title: "Thor: The Dark World", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-iron-man-3", title: "Iron Man 3", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-cap-america-winter-soldier", title: "Captain America: The Winter Soldier", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "together" },
+  {
+    id: "mcu-agents-of-shield-s1",
+    title: "Agents of S.H.I.E.L.D. Season 1",
+    universe: "mcu",
+    phase: "Phase 2",
+    requires: ["mcu-thor-dark-world", "mcu-iron-man-3", "mcu-cap-america-winter-soldier"],
+    episodes: 22,
+    mediaType: "tv",
+  },
   { id: "mcu-gotg-1", title: "Guardians of the Galaxy", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-gotg-2", title: "Guardians of the Galaxy Vol. 2", universe: "mcu", phase: "Phase 2", requires: ["mcu-gotg-1"], mediaType: "movie", tag: "together" },
   { id: "mcu-avengers-age-of-ultron", title: "Avengers: Age of Ultron", universe: "mcu", phase: "Phase 2", requires: ["mcu-thor-dark-world", "mcu-iron-man-3", "mcu-cap-america-winter-soldier"], mediaType: "movie", tag: "together" },
+  {
+    id: "mcu-agents-of-shield-s2",
+    title: "Agents of S.H.I.E.L.D. Season 2",
+    universe: "mcu",
+    phase: "Phase 2",
+    requires: ["mcu-agents-of-shield-s1", "mcu-avengers-age-of-ultron"],
+    episodes: 22,
+    mediaType: "tv",
+  },
+  { id: "mcu-whih-newsfront-s1", title: "WHIH Newsfront Season 1", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-age-of-ultron"], mediaType: "tv" },
   { id: "mcu-ant-man-1", title: "Ant-Man", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-age-of-ultron"], mediaType: "movie", tag: "together" },
 
   /* ---------------------------- MCU — Phase 3 ---------------------------- */
@@ -168,7 +192,7 @@ export const ITEMS: WatchItem[] = [
   { id: "mcu-hawkeye", title: "Hawkeye", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together" },
   { id: "mcu-moon-knight", title: "Moon Knight", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together" },
   { id: "mcu-doctor-strange-multiverse-madness", title: "Doctor Strange in the Multiverse of Madness", universe: "mcu", phase: "Phase 4", requires: ["mcu-spiderman-no-way-home"], mediaType: "movie", tag: "together" },
-  { id: "mcu-ms-marvel", title: "Ms. Marvel", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv" },
+  { id: "mcu-ms-marvel", title: "Ms. Marvel", universe: "mcu", phase: "Phase 4", requires: ["mcu-captain-marvel"], episodes: 6, mediaType: "tv" },
   { id: "mcu-she-hulk", title: "She-Hulk: Attorney at Law", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 9, mediaType: "tv" },
   { id: "mcu-werewolf-by-night", title: "Werewolf by Night", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 1, mediaType: "movie" },
   { id: "mcu-black-panther-wakanda-forever", title: "Black Panther: Wakanda Forever", universe: "mcu", phase: "Phase 4", requires: ["mcu-spiderman-far-from-home"], mediaType: "movie", tag: "together" },
@@ -275,7 +299,7 @@ export const ITEMS: WatchItem[] = [
     mediaType: "movie",
     tag: "together",
   },
-  { id: "mcu-eyes-of-wakanda", title: "Eyes of Wakanda", universe: "mcu", phase: "Phase 6", requires: ["mcu-black-panther-wakanda-forever"], mediaType: "tv", tag: "together" },
+  { id: "mcu-eyes-of-wakanda", title: "Eyes of Wakanda", universe: "mcu", phase: "Phase 6", requires: ["mcu-black-panther-1"], mediaType: "tv", tag: "together" },
   { id: "mcu-daredevil-born-again-2", title: "Daredevil: Born Again Season 2", universe: "mcu", phase: "Phase 6", requires: ["mcu-daredevil-born-again"], mediaType: "tv" },
   {
     id: "mcu-punisher-one-last-kill",

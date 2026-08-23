@@ -21,6 +21,7 @@ const TMDB_ID_OVERRIDES: Record<string, number> = {
   'disney-extras-daredevil-s2': 61889,
   'disney-extras-daredevil-s3': 61889,
   'disney-extras-defenders-s1': 62285, // Marvel's The Defenders
+  'mcu-the-consultant': 76122, // Marvel One-Shot: The Consultant (unqualified "The Consultant" search hits an unrelated 2022 thriller)
 }
 
 // tsx doesn't auto-load .env.local the way `next dev` does — load it by hand,

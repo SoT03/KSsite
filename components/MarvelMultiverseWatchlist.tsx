@@ -9,6 +9,7 @@ import {
   IconAlertCircle,
   IconHeart,
   IconCircleMinus,
+  IconBolt,
   IconSparkles,
   IconX,
 } from "@tabler/icons-react";
@@ -574,6 +575,9 @@ export default function MarvelMultiverseWatchlist() {
                             {item.tag === "skip" && (
                               <IconCircleMinus className="mmw-badge-icon mmw-badge-icon--skip" style={ICON_STYLE} title="Nieistotne" />
                             )}
+                            {item.tag === "one-shot" && (
+                              <IconBolt className="mmw-badge-icon mmw-badge-icon--one-shot" style={ICON_STYLE} title="Krótka forma (One-Shot)" />
+                            )}
                           </div>
                         </div>
 
@@ -989,6 +993,10 @@ const CSS = `
 
 .mmw-badge-icon--skip {
   color: var(--mmw-text-secondary);
+}
+
+.mmw-badge-icon--one-shot {
+  color: var(--mmw-text-warning);
 }
 
 .mmw-card-title-strip {
