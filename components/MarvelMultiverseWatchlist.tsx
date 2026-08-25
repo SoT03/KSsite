@@ -12,15 +12,31 @@ import {
   IconBolt,
   IconSparkles,
   IconX,
+  IconStarFilled,
 } from "@tabler/icons-react";
-import { ITEMS, ITEM_MAP, UNIVERSES, TIERS, type UniverseId, type WatchItem } from "@/lib/marvel-watchlist-data";
+import { ITEMS, ITEM_MAP, UNIVERSES, TIERS, type UniverseId, type WatchItem, type SignificanceBadge } from "@/lib/marvel-watchlist-data";
 
 // Tabler icons render as SVG and default to currentColor for stroke/fill, so
 // the existing CSS classes (which just set `color`) keep working unchanged —
 // this just makes the icon glyph itself inherit the surrounding font-size.
 const ICON_STYLE = { width: "1em", height: "1em" } as const;
 
+// Fixed display order for the top-left significance pills, independent of how
+// each item's `badges` array happens to be written in the data file.
+const BADGE_ORDER: SignificanceBadge[] = ["D", "M", "R", "OS"];
+const BADGE_LABEL: Record<SignificanceBadge, string> = { D: "Wymagane przed Doomsday", M: "Kluczowe dla MCU", R: "Polecane", OS: "Krótka forma (One-Shot)" };
+const sortedBadges = (item: WatchItem) => BADGE_ORDER.filter((b) => item.badges?.includes(b));
+
+// M shows a star glyph instead of its letter; every other badge just prints its own text.
+const BadgePillContent = ({ badge }: { badge: SignificanceBadge }) =>
+  badge === "M" ? <IconStarFilled style={ICON_STYLE} /> : <>{badge}</>;
+
 type ViewId = UniverseId | "tier-list";
+
+// "skip" (not important) and "one-shot" (short bonus film) items never enter the
+// tier list, even once watched — they're not the kind of thing you rank against
+// full movies/seasons.
+const isTierable = (item: WatchItem) => item.tag !== "skip" && item.tag !== "one-shot";
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -186,7 +202,7 @@ export default function MarvelMultiverseWatchlist() {
     const byTierRaw: Record<string, WatchItem[]> = {};
     for (const t of TIERS) byTierRaw[t.key] = [];
     for (const item of ITEMS) {
-      if (!watched.has(item.id)) continue;
+      if (!watched.has(item.id) || !isTierable(item)) continue;
       const t = tiers[item.id];
       if (t && byTierRaw[t]) byTierRaw[t].push(item);
       else unrankedRaw.push(item);
@@ -315,6 +331,14 @@ export default function MarvelMultiverseWatchlist() {
     [tiers, watched]
   );
 
+  // Denominator for the Tier List tab's progress bar: watched items that are
+  // actually eligible to be tiered, so it can reach 100% instead of being
+  // permanently capped by skip/one-shot items that never appear on the board.
+  const tierableWatchedCount = useMemo(
+    () => ITEMS.filter((item) => watched.has(item.id) && isTierable(item)).length,
+    [watched]
+  );
+
   const renderTierCard = (item: WatchItem, removable: boolean) => {
     const posterUrl = posters[item.id];
     return (
@@ -334,6 +358,15 @@ export default function MarvelMultiverseWatchlist() {
           ) : (
             <div className="mmw-poster-fallback">
               <IconMovie style={ICON_STYLE} />
+            </div>
+          )}
+          {sortedBadges(item).length > 0 && (
+            <div className="mmw-tag-badges mmw-tag-badges--tier">
+              {sortedBadges(item).map((badge) => (
+                <span key={badge} className={`mmw-tag-pill mmw-tag-pill--${badge.toLowerCase()}`} title={BADGE_LABEL[badge]}>
+                  <BadgePillContent badge={badge} />
+                </span>
+              ))}
             </div>
           )}
           {removable && (
@@ -383,6 +416,14 @@ export default function MarvelMultiverseWatchlist() {
           />
         </div>
         <div className="mmw-global-percent">{globalPercent}% ukończone</div>
+        <div className="mmw-legend">
+          {BADGE_ORDER.map((badge) => (
+            <span key={badge} className="mmw-legend-item">
+              <span className={`mmw-tag-pill mmw-tag-pill--${badge.toLowerCase()}`}><BadgePillContent badge={badge} /></span>
+              <span className={`mmw-legend-label mmw-legend-label--${badge.toLowerCase()}`}>{BADGE_LABEL[badge]}</span>
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mmw-layout">
@@ -425,13 +466,13 @@ export default function MarvelMultiverseWatchlist() {
               <div className="mmw-tab-row">
                 <span className="mmw-tab-name">🏆 Tier List</span>
                 <span className="mmw-tab-count">
-                  {tieredCount}/{watchedCount}
+                  {tieredCount}/{tierableWatchedCount}
                 </span>
               </div>
               <div className="mmw-progress-track mmw-progress-track--sm">
                 <div
                   className="mmw-progress-fill"
-                  style={{ width: `${watchedCount === 0 ? 0 : Math.round((tieredCount / watchedCount) * 100)}%` }}
+                  style={{ width: `${tierableWatchedCount === 0 ? 0 : Math.round((tieredCount / tierableWatchedCount) * 100)}%` }}
                 />
               </div>
             </button>
@@ -558,6 +599,15 @@ export default function MarvelMultiverseWatchlist() {
                           ) : (
                             <div className="mmw-poster-fallback">
                               <IconMovie style={ICON_STYLE} />
+                            </div>
+                          )}
+                          {sortedBadges(item).length > 0 && (
+                            <div className="mmw-tag-badges">
+                              {sortedBadges(item).map((badge) => (
+                                <span key={badge} className={`mmw-tag-pill mmw-tag-pill--${badge.toLowerCase()}`} title={BADGE_LABEL[badge]}>
+                                  <BadgePillContent badge={badge} />
+                                </span>
+                              ))}
                             </div>
                           )}
                           {watchedFlag && (
@@ -968,6 +1018,113 @@ const CSS = `
   display: flex;
   gap: 0.25rem;
   z-index: 2;
+}
+
+.mmw-tag-badges {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.22rem;
+  z-index: 2;
+  max-width: calc(100% - 0.8rem);
+}
+
+.mmw-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  padding: 0.28rem 0.44rem;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(2px);
+  text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mmw-card-item:hover .mmw-tag-pill {
+  transform: translateY(-1px);
+}
+
+.mmw-tag-pill--d {
+  background: linear-gradient(160deg, #34d071, #15803d);
+  color: #fff;
+}
+
+.mmw-tag-pill--m {
+  background: linear-gradient(160deg, #fde047, #ea580c);
+  color: #fff;
+}
+
+.mmw-tag-pill--m svg {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.mmw-tag-pill--r {
+  background: linear-gradient(160deg, #60a5fa, #1d4ed8);
+  color: #fff;
+}
+
+.mmw-tag-pill--os {
+  background: linear-gradient(160deg, #e2e6eb, #9aa0ab);
+  color: #14161a;
+  text-shadow: none;
+}
+
+.mmw-tag-badges--tier {
+  top: 0.25rem;
+  left: 0.25rem;
+  gap: 0.14rem;
+  max-width: calc(100% - 0.5rem);
+}
+
+.mmw-tag-badges--tier .mmw-tag-pill {
+  font-size: 0.5rem;
+  padding: 0.14rem 0.28rem;
+  border-radius: 4px;
+}
+
+.mmw-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 0.5px solid var(--mmw-border);
+}
+
+.mmw-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mmw-legend-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--mmw-text-secondary);
+}
+
+.mmw-legend-label--d {
+  color: #4ade80;
+}
+
+.mmw-legend-label--m {
+  color: #fb923c;
+}
+
+.mmw-legend-label--r {
+  color: #60a5fa;
 }
 
 .mmw-badge-icon {
