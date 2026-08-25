@@ -360,15 +360,6 @@ export default function MarvelMultiverseWatchlist() {
               <IconMovie style={ICON_STYLE} />
             </div>
           )}
-          {sortedBadges(item).length > 0 && (
-            <div className="mmw-tag-badges mmw-tag-badges--tier">
-              {sortedBadges(item).map((badge) => (
-                <span key={badge} className={`mmw-tag-pill mmw-tag-pill--${badge.toLowerCase()}`} title={BADGE_LABEL[badge]}>
-                  <BadgePillContent badge={badge} />
-                </span>
-              ))}
-            </div>
-          )}
           {removable && (
             <button
               type="button"
@@ -1079,19 +1070,6 @@ const CSS = `
   background: linear-gradient(160deg, #e2e6eb, #9aa0ab);
   color: #14161a;
   text-shadow: none;
-}
-
-.mmw-tag-badges--tier {
-  top: 0.25rem;
-  left: 0.25rem;
-  gap: 0.14rem;
-  max-width: calc(100% - 0.5rem);
-}
-
-.mmw-tag-badges--tier .mmw-tag-pill {
-  font-size: 0.5rem;
-  padding: 0.14rem 0.28rem;
-  border-radius: 4px;
 }
 
 .mmw-legend {
