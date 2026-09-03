@@ -1,6 +1,6 @@
 // lib/marvel-watchlist-data.ts
 //
-// Shared source of truth for the Marvel Multiverse Watchlist: the 105-item
+// Shared source of truth for the Marvel Multiverse Watchlist: the 108-item
 // list, unlock graph, and universe metadata. Imported by both the client
 // component and server-side code (poster fetch script, API routes) so the
 // two never drift apart.
@@ -79,7 +79,7 @@ export const UNIVERSES: Universe[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Item data (106 entries)                                            */
+/*  Item data (108 entries)                                            */
 /* ------------------------------------------------------------------ */
 
 export const ITEMS: WatchItem[] = [
@@ -158,14 +158,25 @@ export const ITEMS: WatchItem[] = [
     tag: "together",
     badges: ["M"],
   },
+  { id: "mcu-eyes-of-wakanda", title: "Eyes of Wakanda", universe: "mcu", phase: "Phase 3", requires: ["mcu-black-panther-1"], mediaType: "tv", tag: "together", badges: ["R"] },
   { id: "mcu-spiderman-homecoming", title: "Spider-Man: Homecoming", universe: "mcu", phase: "Phase 3", requires: ["mcu-cap-america-civil-war"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-doctor-strange-1", title: "Doctor Strange", universe: "mcu", phase: "Phase 3", requires: ["mcu-black-widow", "mcu-black-panther-1", "mcu-spiderman-homecoming"], mediaType: "movie", tag: "together", badges: ["M"] },
+  { id: "mcu-cloak-dagger-s1", title: "Cloak & Dagger Season 1", universe: "mcu", phase: "Phase 3", requires: ["mcu-doctor-strange-1"], episodes: 10, mediaType: "tv" },
   {
     id: "mcu-agents-of-shield-s4",
     title: "Agents of S.H.I.E.L.D. Season 4",
     universe: "mcu",
     phase: "Phase 3",
     requires: ["mcu-doctor-strange-1", "mcu-agents-of-shield-s3"],
+    episodes: 22,
+    mediaType: "tv",
+  },
+  {
+    id: "mcu-agents-of-shield-s5",
+    title: "Agents of S.H.I.E.L.D. Season 5",
+    universe: "mcu",
+    phase: "Phase 3",
+    requires: ["mcu-agents-of-shield-s4"],
     episodes: 22,
     mediaType: "tv",
   },
@@ -223,7 +234,7 @@ export const ITEMS: WatchItem[] = [
   { id: "mcu-hawkeye", title: "Hawkeye", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together", badges: ["M"] },
   { id: "mcu-moon-knight", title: "Moon Knight", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together" },
   { id: "mcu-doctor-strange-multiverse-madness", title: "Doctor Strange in the Multiverse of Madness", universe: "mcu", phase: "Phase 4", requires: ["mcu-spiderman-no-way-home", "mcu-wandavision"], mediaType: "movie", tag: "together", badges: ["D", "M"] },
-  { id: "mcu-ms-marvel", title: "Ms. Marvel", universe: "mcu", phase: "Phase 4", requires: ["mcu-captain-marvel"], episodes: 6, mediaType: "tv", badges: ["R"] },
+  { id: "mcu-ms-marvel", title: "Ms. Marvel", universe: "mcu", phase: "Phase 4", requires: ["mcu-captain-marvel", "mcu-endgame"], episodes: 6, mediaType: "tv", badges: ["R"] },
   { id: "mcu-she-hulk", title: "She-Hulk: Attorney at Law", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 9, mediaType: "tv" },
   { id: "mcu-werewolf-by-night", title: "Werewolf by Night", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 1, mediaType: "movie" },
   { id: "mcu-black-panther-wakanda-forever", title: "Black Panther: Wakanda Forever", universe: "mcu", phase: "Phase 4", requires: ["mcu-spiderman-far-from-home"], mediaType: "movie", tag: "together", badges: ["D", "R"] },
@@ -337,13 +348,13 @@ export const ITEMS: WatchItem[] = [
     tag: "together",
     badges: ["D", "M"],
   },
-  { id: "mcu-eyes-of-wakanda", title: "Eyes of Wakanda", universe: "mcu", phase: "Phase 6", requires: ["mcu-black-panther-1"], mediaType: "tv", tag: "together", badges: ["R"] },
   { id: "mcu-daredevil-born-again-2", title: "Daredevil: Born Again Season 2", universe: "mcu", phase: "Phase 6", requires: ["mcu-daredevil-born-again"], mediaType: "tv", badges: ["R"] },
   {
     id: "mcu-punisher-one-last-kill",
     title: "Punisher: One Last Kill",
     universe: "mcu",
     phase: "Phase 6",
+    requires: ["mcu-spiderman-no-way-home"],
     recommended: ["disney-extras-punisher-s1", "disney-extras-punisher-s2"],
     mediaType: "movie",
     badges: ["R"],
@@ -354,12 +365,23 @@ export const ITEMS: WatchItem[] = [
     title: "Avengers: Doomsday",
     universe: "mcu",
     phase: "Phase 6",
-    requires: ["mcu-endgame", "mcu-spiderman-brand-new-day", "mcu-fantastic-four-first-steps", "mcu-thunderbolts"],
+    requires: [
+      "fox-xmen-2",
+      "mcu-endgame",
+      "mcu-loki-s1",
+      "mcu-shang-chi",
+      "mcu-spiderman-no-way-home",
+      "mcu-black-panther-wakanda-forever",
+      "mcu-deadpool-wolverine",
+      "mcu-doctor-strange-multiverse-madness",
+      "mcu-captain-america-brave-new-world",
+      "mcu-thunderbolts",
+      "mcu-fantastic-four-first-steps",
+    ],
     recommended: [
       "fox-xmen-first-class",
       "fox-xmen-origins-wolverine",
       "fox-xmen",
-      "fox-xmen-2",
       "fox-xmen-last-stand",
       "fox-xmen-the-wolverine",
       "fox-xmen-days-of-future-past",
@@ -448,7 +470,7 @@ export const ITEMS: WatchItem[] = [
 
   /* ---------------------------- The Defenders Saga (Netflix) ---------------------------- */
   { id: "disney-extras-daredevil-s1", title: "Daredevil Season 1", universe: "disney-extras", phase: "Netflix Marvel", episodes: 13, mediaType: "tv", badges: ["R"] },
-  { id: "disney-extras-jessica-jones-s1", title: "Jessica Jones Season 1", universe: "disney-extras", phase: "Netflix Marvel", episodes: 13, mediaType: "tv", tag: "skip" },
+  { id: "disney-extras-jessica-jones-s1", title: "Jessica Jones Season 1", universe: "disney-extras", phase: "Netflix Marvel", episodes: 13, mediaType: "tv" },
   { id: "disney-extras-daredevil-s2", title: "Daredevil Season 2", universe: "disney-extras", phase: "Netflix Marvel", requires: ["disney-extras-daredevil-s1"], episodes: 13, mediaType: "tv", badges: ["R"] },
   { id: "disney-extras-luke-cage-s1", title: "Luke Cage Season 1", universe: "disney-extras", phase: "Netflix Marvel", episodes: 13, mediaType: "tv", tag: "skip" },
   { id: "disney-extras-iron-fist-s1", title: "Iron Fist Season 1", universe: "disney-extras", phase: "Netflix Marvel", episodes: 13, mediaType: "tv", tag: "skip" },
