@@ -85,13 +85,14 @@ export const UNIVERSES: Universe[] = [
 export const ITEMS: WatchItem[] = [
   /* ---------------------------- MCU — Phase 1 ---------------------------- */
   { id: "mcu-cap-america-1", title: "Captain America: The First Avenger", universe: "mcu", phase: "Phase 1", mediaType: "movie", tag: "together", badges: ["D", "M"] },
+  { id: "mcu-agent-carter-one-shot", title: "Agent Carter", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", tag: "one-shot", badges: ["OS"] },
   { id: "mcu-agent-carter-s1", title: "Agent Carter Season 1", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], episodes: 8, mediaType: "tv" },
   { id: "mcu-agent-carter-s2", title: "Agent Carter Season 2", universe: "mcu", phase: "Phase 1", requires: ["mcu-agent-carter-s1"], episodes: 10, mediaType: "tv" },
   { id: "mcu-captain-marvel", title: "Captain Marvel", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", badges: ["M"] },
   { id: "mcu-iron-man-1", title: "Iron Man", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-iron-man-2", title: "Iron Man 2", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-1"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-hulk", title: "The Incredible Hulk", universe: "mcu", phase: "Phase 1", requires: ["mcu-cap-america-1"], mediaType: "movie", tag: "together", badges: ["M"] },
-  { id: "mcu-thor-one-shot", title: "A Funny Thing Happened on the Way to Thor's Hammer", universe: "mcu", phase: "Phase 1", requires: ["mcu-thor-1"], mediaType: "movie", tag: "one-shot", badges: ["OS"] },
+  { id: "mcu-thor-one-shot", title: "A Funny Thing Happened on the Way to Thor's Hammer", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-2"], mediaType: "movie", tag: "one-shot", badges: ["OS"] },
   { id: "mcu-thor-1", title: "Thor", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-1", "mcu-hulk"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-the-consultant", title: "The Consultant", universe: "mcu", phase: "Phase 1", requires: ["mcu-thor-1"], mediaType: "movie", tag: "one-shot", badges: ["OS"] },
   { id: "mcu-avengers-1", title: "The Avengers", universe: "mcu", phase: "Phase 1", requires: ["mcu-iron-man-2", "mcu-thor-1"], mediaType: "movie", tag: "together", badges: ["D", "M"] },
