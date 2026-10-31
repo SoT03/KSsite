@@ -304,11 +304,13 @@ export const ITEMS: WatchItem[] = [
     tag: "together",
     badges: ["R"],
   },
+
+  /* ---------------------------- MCU — Phase 6 ---------------------------- */
   {
     id: "mcu-thunderbolts",
     title: "Thunderbolts*",
     universe: "mcu",
-    phase: "Phase 5",
+    phase: "Phase 6",
     requires: ["mcu-black-widow", "mcu-falcon-winter-soldier", "mcu-captain-america-brave-new-world"],
     mediaType: "movie",
     tag: "together",
@@ -318,13 +320,11 @@ export const ITEMS: WatchItem[] = [
     id: "mcu-ironheart-s1",
     title: "Ironheart Season 1",
     universe: "mcu",
-    phase: "Phase 5",
+    phase: "Phase 6",
     requires: ["mcu-black-panther-wakanda-forever"],
     episodes: 6,
     mediaType: "tv",
   },
-
-  /* ---------------------------- MCU — Phase 6 ---------------------------- */
   {
     id: "mcu-fantastic-four-first-steps",
     title: "The Fantastic Four: First Steps",
