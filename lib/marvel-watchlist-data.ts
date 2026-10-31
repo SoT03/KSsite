@@ -203,6 +203,7 @@ export const ITEMS: WatchItem[] = [
   { id: "mcu-wandavision", title: "WandaVision", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 9, mediaType: "tv", badges: ["M"] },
   { id: "mcu-shang-chi", title: "Shang-Chi and the Legend of the Ten Rings", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], mediaType: "movie", tag: "together", badges: ["D", "R"] },
   { id: "mcu-falcon-winter-soldier", title: "The Falcon and the Winter Soldier", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", badges: ["M"] },
+  { id: "mcu-what-if-s1", title: "What If...? Season 1", universe: "mcu", phase: "Phase 4", requires: ["mcu-loki-s1"], episodes: 9, mediaType: "tv" },
   { id: "mcu-eternals", title: "Eternals", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], mediaType: "movie", badges: ["M"] },
   {
     id: "mcu-spiderman-far-from-home",
@@ -219,6 +220,7 @@ export const ITEMS: WatchItem[] = [
   { id: "mcu-hawkeye", title: "Hawkeye", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together", badges: ["M"] },
   { id: "mcu-moon-knight", title: "Moon Knight", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 6, mediaType: "tv", tag: "together" },
   { id: "mcu-doctor-strange-multiverse-madness", title: "Doctor Strange in the Multiverse of Madness", universe: "mcu", phase: "Phase 4", requires: ["mcu-spiderman-no-way-home", "mcu-wandavision"], mediaType: "movie", tag: "together", badges: ["D", "M"] },
+  { id: "mcu-what-if-s2", title: "What If...? Season 2", universe: "mcu", phase: "Phase 4", requires: ["mcu-what-if-s1"], episodes: 9, mediaType: "tv" },
   { id: "mcu-ms-marvel", title: "Ms. Marvel", universe: "mcu", phase: "Phase 4", requires: ["mcu-captain-marvel", "mcu-endgame"], episodes: 6, mediaType: "tv", badges: ["R"] },
   { id: "mcu-she-hulk", title: "She-Hulk: Attorney at Law", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 9, mediaType: "tv" },
   { id: "mcu-werewolf-by-night", title: "Werewolf by Night", universe: "mcu", phase: "Phase 4", requires: ["mcu-endgame"], episodes: 1, mediaType: "movie" },
@@ -239,6 +241,7 @@ export const ITEMS: WatchItem[] = [
     tag: "together",
     badges: ["M"],
   },
+  { id: "mcu-what-if-s3", title: "What If...? Season 3", universe: "mcu", phase: "Phase 5", requires: ["mcu-what-if-s2"], episodes: 8, mediaType: "tv" },
   {
     id: "mcu-thor-love-thunder",
     title: "Thor: Love and Thunder",
