@@ -1,6 +1,6 @@
 // lib/marvel-watchlist-data.ts
 //
-// Shared source of truth for the Marvel Multiverse Watchlist: the 108-item
+// Shared source of truth for the Marvel Multiverse Watchlist: the 115-item
 // list, unlock graph, and universe metadata. Imported by both the client
 // component and server-side code (poster fetch script, API routes) so the
 // two never drift apart.
@@ -79,7 +79,7 @@ export const UNIVERSES: Universe[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Item data (108 entries)                                            */
+/*  Item data (115 entries)                                            */
 /* ------------------------------------------------------------------ */
 
 export const ITEMS: WatchItem[] = [
@@ -112,6 +112,8 @@ export const ITEMS: WatchItem[] = [
     mediaType: "tv",
   },
   { id: "mcu-gotg-1", title: "Guardians of the Galaxy", universe: "mcu", phase: "Phase 2", requires: ["mcu-avengers-1"], mediaType: "movie", tag: "together", badges: ["M"] },
+  { id: "mcu-i-am-groot-s1", title: "I Am Groot Season 1", universe: "mcu", phase: "Phase 2", requires: ["mcu-gotg-1"], episodes: 5, mediaType: "tv" },
+  { id: "mcu-i-am-groot-s2", title: "I Am Groot Season 2", universe: "mcu", phase: "Phase 2", requires: ["mcu-i-am-groot-s1"], episodes: 5, mediaType: "tv" },
   { id: "mcu-gotg-2", title: "Guardians of the Galaxy Vol. 2", universe: "mcu", phase: "Phase 2", requires: ["mcu-gotg-1"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-avengers-age-of-ultron", title: "Avengers: Age of Ultron", universe: "mcu", phase: "Phase 2", requires: ["mcu-thor-dark-world", "mcu-iron-man-3", "mcu-cap-america-winter-soldier"], mediaType: "movie", tag: "together", badges: ["M"] },
   {
@@ -163,24 +165,6 @@ export const ITEMS: WatchItem[] = [
   { id: "mcu-spiderman-homecoming", title: "Spider-Man: Homecoming", universe: "mcu", phase: "Phase 3", requires: ["mcu-cap-america-civil-war"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-doctor-strange-1", title: "Doctor Strange", universe: "mcu", phase: "Phase 3", requires: ["mcu-black-widow", "mcu-black-panther-1", "mcu-spiderman-homecoming"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-cloak-dagger-s1", title: "Cloak & Dagger Season 1", universe: "mcu", phase: "Phase 3", requires: ["mcu-doctor-strange-1"], episodes: 10, mediaType: "tv" },
-  {
-    id: "mcu-agents-of-shield-s4",
-    title: "Agents of S.H.I.E.L.D. Season 4",
-    universe: "mcu",
-    phase: "Phase 3",
-    requires: ["mcu-doctor-strange-1", "mcu-agents-of-shield-s3"],
-    episodes: 22,
-    mediaType: "tv",
-  },
-  {
-    id: "mcu-agents-of-shield-s5",
-    title: "Agents of S.H.I.E.L.D. Season 5",
-    universe: "mcu",
-    phase: "Phase 3",
-    requires: ["mcu-agents-of-shield-s4"],
-    episodes: 22,
-    mediaType: "tv",
-  },
   { id: "mcu-thor-ragnarok", title: "Thor: Ragnarok", universe: "mcu", phase: "Phase 3", requires: ["mcu-doctor-strange-1"], mediaType: "movie", tag: "together", badges: ["M"] },
   { id: "mcu-ant-man-wasp", title: "Ant-Man and the Wasp", universe: "mcu", phase: "Phase 3", requires: ["mcu-doctor-strange-1"], mediaType: "movie", tag: "together", badges: ["M"] },
   {
@@ -250,8 +234,7 @@ export const ITEMS: WatchItem[] = [
     title: "Ant-Man and the Wasp: Quantumania",
     universe: "mcu",
     phase: "Phase 5",
-    requires: ["mcu-doctor-strange-multiverse-madness", "mcu-black-panther-wakanda-forever"],
-    recommended: ["mcu-loki-s1"],
+    requires: ["mcu-loki-s1"],
     mediaType: "movie",
     tag: "together",
     badges: ["M"],
@@ -312,7 +295,7 @@ export const ITEMS: WatchItem[] = [
     title: "Daredevil: Born Again Season 1",
     universe: "mcu",
     phase: "Phase 5",
-    requires: ["disney-extras-daredevil-s3", "mcu-echo-s1"],
+    requires: ["disney-extras-daredevil-s3"],
     episodes: 9,
     mediaType: "tv",
     tag: "together",
@@ -323,7 +306,7 @@ export const ITEMS: WatchItem[] = [
     title: "Thunderbolts*",
     universe: "mcu",
     phase: "Phase 5",
-    requires: ["mcu-black-widow", "mcu-falcon-winter-soldier", "mcu-hawkeye"],
+    requires: ["mcu-black-widow", "mcu-falcon-winter-soldier", "mcu-captain-america-brave-new-world"],
     mediaType: "movie",
     tag: "together",
     badges: ["D", "M"],
@@ -344,7 +327,7 @@ export const ITEMS: WatchItem[] = [
     title: "The Fantastic Four: First Steps",
     universe: "mcu",
     phase: "Phase 6",
-    requires: ["mcu-doctor-strange-multiverse-madness"],
+    requires: ["mcu-thunderbolts"],
     mediaType: "movie",
     tag: "together",
     badges: ["D", "M"],
@@ -361,6 +344,16 @@ export const ITEMS: WatchItem[] = [
     badges: ["R"],
   },
   { id: "mcu-spiderman-brand-new-day", title: "Spider-Man: Brand New Day", universe: "mcu", phase: "Phase 6", requires: ["mcu-spiderman-no-way-home"], mediaType: "movie", tag: "together", badges: ["M"] },
+  {
+    id: "mcu-visionquest",
+    title: "VisionQuest",
+    universe: "mcu",
+    phase: "Phase 6",
+    requires: ["mcu-wandavision"],
+    recommended: ["mcu-agatha-all-along"],
+    mediaType: "tv",
+    badges: ["M"],
+  },
   {
     id: "mcu-avengers-doomsday",
     title: "Avengers: Doomsday",
