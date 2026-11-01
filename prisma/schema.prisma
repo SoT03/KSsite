@@ -18,8 +18,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  openedBoxes  BoxOpening[]
-  watchedItems WatchedItem[]
+  openedBoxes   BoxOpening[]
+  watchedItems  WatchedItem[]
+  surveyAnswers SurveyAnswer[]
 }
 
 model Message {
@@ -62,6 +63,18 @@ model WatchedItem {
   order     Int      @default(0) // left-to-right rank within its tier (or within Unranked); lower sorts first
 
   @@unique([userId, itemId])
+}
+
+model SurveyAnswer {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String // a SurveyQuestion.id from lib/marvel-survey-data.ts, e.g. "fav-duo"
+  value      String // an item id, character id, option id, or "custom:<text>" — see lib/marvel-survey-data.ts
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, questionId])
 }
 
 model PosterCache {

@@ -13,7 +13,8 @@
     "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio",
     "db:push": "prisma db push",
-    "posters:fetch": "tsx scripts/fetch-posters.ts"
+    "posters:fetch": "tsx scripts/fetch-posters.ts",
+    "characters:fetch": "tsx scripts/fetch-characters.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

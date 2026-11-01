@@ -15,6 +15,7 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react";
 import { ITEMS, ITEM_MAP, UNIVERSES, TIERS, type UniverseId, type WatchItem, type SignificanceBadge } from "@/lib/marvel-watchlist-data";
+import MarvelSurvey from "@/components/MarvelSurvey";
 
 // Tabler icons render as SVG and default to currentColor for stroke/fill, so
 // the existing CSS classes (which just set `color`) keep working unchanged —
@@ -31,7 +32,7 @@ const sortedBadges = (item: WatchItem) => BADGE_ORDER.filter((b) => item.badges?
 const BadgePillContent = ({ badge }: { badge: SignificanceBadge }) =>
   badge === "M" ? <IconStarFilled style={ICON_STYLE} /> : <>{badge}</>;
 
-type ViewId = UniverseId | "tier-list";
+type ViewId = UniverseId | "tier-list" | "survey";
 
 // "skip" (not important) and "one-shot" (short bonus film) items never enter the
 // tier list, even once watched — they're not the kind of thing you rank against
@@ -467,12 +468,24 @@ export default function MarvelMultiverseWatchlist() {
                 />
               </div>
             </button>
+
+            <button
+              type="button"
+              className={`mmw-tab mmw-tab--survey${activeTab === "survey" ? " mmw-tab--active" : ""}`}
+              onClick={() => setActiveTab("survey")}
+            >
+              <div className="mmw-tab-row">
+                <span className="mmw-tab-name">📝 Ankieta</span>
+              </div>
+            </button>
           </div>
         </div>
 
         {/* Section 3: Movie Grid / Tier List */}
         <div className={`mmw-grid-col${activeTab === "tier-list" ? " mmw-grid-col--tier" : ""}`}>
-          {activeTab === "tier-list" ? (
+          {activeTab === "survey" ? (
+            <MarvelSurvey watched={watched} tiers={tiers} orders={orders} posters={posters} />
+          ) : activeTab === "tier-list" ? (
             <>
               {TIERS.map((tierDef) => {
                 const items = tierBoard.byTier[tierDef.key];
@@ -688,6 +701,7 @@ export default function MarvelMultiverseWatchlist() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
@@ -840,6 +854,10 @@ const CSS = `
   margin-top: 0.5rem;
   border-top: 0.5px solid var(--mmw-border);
   padding-top: 0.85rem;
+}
+
+.mmw-tab--survey .mmw-tab-row {
+  min-height: 1.4rem;
 }
 
 .mmw-tab-row {

@@ -10,7 +10,7 @@ import type { NextRequest } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 
 const MARVEL_ALLOWED_PAGE_PREFIXES = ['/marvel-watchlist', '/login']
-const MARVEL_ALLOWED_API_PREFIXES = ['/api/auth', '/api/watchlist', '/api/posters']
+const MARVEL_ALLOWED_API_PREFIXES = ['/api/auth', '/api/watchlist', '/api/posters', '/api/survey']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
