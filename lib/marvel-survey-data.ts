@@ -74,11 +74,11 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
   },
   {
     id: "civil-war-team",
-    label: "Drużyna z Wojny bohaterów",
+    label: "Wojna bohaterów: kto miał rację w sprawie Porozumień z Sokovii?",
     kind: "options",
     options: [
-      opt("iron-man", "Drużyna Iron Mana", "mcu-cap-america-civil-war"),
-      opt("cap", "Drużyna Kapitana", "mcu-cap-america-civil-war"),
+      opt("iron-man", "Drużyna Iron Mana — podpisać Porozumienia", "mcu-cap-america-civil-war"),
+      opt("cap", "Drużyna Kapitana — odrzucić Porozumienia", "mcu-cap-america-civil-war"),
     ],
   },
   {
